@@ -1,0 +1,41 @@
+{
+  "name": "Cards Against Humanity",
+  "title": "Cards Against Humanity",
+  "description": "The game is simple. Each round, one player asks a question from a Black Card, and everyone else answers with their funniest White Card.",
+  "version": "0.0.1",
+  "homepage": "https://github.com/forrestberries/game-off-2012",
+  "authors": [
+    {
+      "name": "Collin Forrester",
+      "email": "collin.forrester@gmail.com",
+      "url": ""
+    },
+    {
+      "name": "Mitch Barry",
+      "email": "mitch@mitchbarry.com",
+      "url": ""
+    }
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/forrestberries/game-off-2012.git"
+  },
+  "bugs": {
+    "url": ""
+  },
+  "licenses": [
+    {
+      "type": "MIT",
+      "url": ""
+    }
+  ],
+  "dependencies": {
+    "jquery": "1.8.1",
+    "backbone": "0.9.2",
+    "lodash": "0.6.1",
+    "require": "2.0.5",
+    "r.js": "2.0.5",
+    "modernizr": "2.5.3"
+  },
+  "keywords": ["Backbone.js", "Require.js", "Cards Against Humanity"]
+}
