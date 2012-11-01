@@ -33,7 +33,7 @@ require.config({
 });
 
 // Include Mobile Specific JavaScript files here (or inside of your Mobile router)
-require(['modernizr','jquery','backbone','routers/mobileRouter','bootstrap','backbone.validateAll', 'less'], function(Modernizr, $, Backbone, Mobile, Less) {
+require(['modernizr','jquery','backbone','routers/mobileRouter','bootstrap','backbone.validateAll'], function(Modernizr, $, Backbone, Mobile) {
 
     // Instantiates a new Router
     this.router = new Mobile();
