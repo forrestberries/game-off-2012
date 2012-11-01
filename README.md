@@ -1,16 +1,19 @@
 ## The Game
-Cards against humanity.
+Cards against humanity.  The full instructions can be found [here](http://s3.amazonaws.com/cah/CAH_Rules.pdf). The main concept is that each player *pulls* cards from the pile and *pushes* the best card to complete the Card Czar's fill in the blank or question card.
 
 ## The Tools
+* Less
+* Socket.io
 * jQuery
 * Backbone
 * Lodash
 * Require
 * Modernizr
-* Twitter
-* Bootstrap
+* Twitter Bootstrap
 * Jasmine
-______________________________________________________________________
+
+Original message below:
+
 Here at GitHub, we're no strangers to hosting or sponsoring hackathons. With the growing number of games and game development resources on GitHub, we thought it was about time to throw our very own game jam!
 
 ## The Challenge

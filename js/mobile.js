@@ -32,8 +32,8 @@ require.config({
   
 });
 
-// Include Desktop Specific JavaScript files here (or inside of your Desktop router)
-require(['modernizr','jquery','backbone','routers/mobileRouter','bootstrap','backbone.validateAll'], function(Modernizr, $, Backbone, Mobile) {
+// Include Mobile Specific JavaScript files here (or inside of your Mobile router)
+require(['modernizr','jquery','backbone','routers/mobileRouter','bootstrap','backbone.validateAll', 'less'], function(Modernizr, $, Backbone, Mobile, Less) {
 
     // Instantiates a new Router
     this.router = new Mobile();

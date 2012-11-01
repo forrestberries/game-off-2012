@@ -8,7 +8,7 @@ var requirejs = require('./r.js');
 var baseConfig = {
   
   // Tells Require.js to look at desktop.js for all shim and path configurations
-  mainConfigFile: "desktop.js",
+  mainConfigFile: "mobile.js",
 
   wrap: true,
     
@@ -30,11 +30,7 @@ var configs = [
     {
         include: ["mobile"],
         out: "mobile.min.js"
-    },
-    {
-        include: ["desktop"],
-        out: "desktop.min.js"
-    },
+    }
 ]; 
 
 
