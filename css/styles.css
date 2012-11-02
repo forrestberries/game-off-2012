@@ -29,3 +29,9 @@ input {
   padding-left: 20px;
   color: #777777;
 }
+.home-view button {
+  width: 33%;
+}
+.home-view .row {
+  text-align: center;
+}
