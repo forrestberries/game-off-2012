@@ -10,7 +10,8 @@ require.config({
       "bootstrap": "plugins/bootstrap",
       "underscore": "libs/lodash",
       "backbone": "libs/backbone",
-      "backbone.validateAll": "plugins/Backbone.validateAll"
+      "backbone.validateAll": "plugins/Backbone.validateAll",
+      "socket.io": "http://meowstep.com:20080/socket.io/socket.io.js"
 
   },
 
