@@ -34,8 +34,12 @@ require.config({
 });
 
 // Include Mobile Specific JavaScript files here (or inside of your Mobile router)
-require(['modernizr','jquery','backbone','routers/mobileRouter','bootstrap','backbone.validateAll'], function(Modernizr, $, Backbone, Mobile) {
+require(['modernizr','jquery','backbone','routers/homeRouter', 'routers/gameRouter','bootstrap','backbone.validateAll'], function(Modernizr, $, Backbone, HomeRouter, GameRouter) {
 
-    // Instantiates a new Router
-    this.router = new Mobile();
+  // Instantiates a new Router
+  if( document.URL.indexOf( 'index.html' ) > -1 ) {
+    this.router = new HomeRouter();
+  } else {
+    this.router = new GameRouter();
+  }
 });
