@@ -1,6 +1,6 @@
 define(["jquery", "backbone"], function($, Backbone) {
 
-    var Player = Backbone.Model.extend({
+    var Round = Backbone.Model.extend({
 
         // Model Constructor
         initialize: function() {
@@ -9,7 +9,7 @@ define(["jquery", "backbone"], function($, Backbone) {
 
         },
 
-        // Default values for all of the Player Model attributes
+        // Default values for all of the Round Model attributes
         defaults: {
 
             whiteCards: []
@@ -21,7 +21,7 @@ define(["jquery", "backbone"], function($, Backbone) {
     });
 
     // Returns the Model class
-    return Player;
+    return Round;
 
 });
 
