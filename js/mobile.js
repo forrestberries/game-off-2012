@@ -38,8 +38,10 @@ require(['modernizr','jquery','backbone','routers/homeRouter', 'routers/gameRout
 
   // Instantiates a new Router
   if( document.URL.indexOf( 'index.html' ) > -1 ) {
+    console.log( 'starting homeRouter' );
     this.router = new HomeRouter();
   } else {
+    console.log( 'starting GameRouter' );
     this.router = new GameRouter();
   }
 });

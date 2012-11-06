@@ -1,4 +1,4 @@
-define(['jquery', 'backbone', 'socket.io'], function($, Backbone, Socket){
+define(['jquery', 'backbone'], function($, Backbone){
   var View = Backbone.View.extend({
 
     el: "section#main",
@@ -7,7 +7,7 @@ define(['jquery', 'backbone', 'socket.io'], function($, Backbone, Socket){
       this.id = id;
       this.template = _.template( $("#game-view").html(), { id: id } );
 
-      this.sync();
+      //this.sync();
       this.render();
     },
 
@@ -19,7 +19,7 @@ define(['jquery', 'backbone', 'socket.io'], function($, Backbone, Socket){
       this.socket = io.connect( 'http://meowstep.com:20080' );
       /* HARD CODED, DELETE WHEN MODELS ARE FINISHED */
       var player = {},
-          game {};
+          game = {};
       player.name = 'bob';
       game.players = [];
       game.players.push( player );
