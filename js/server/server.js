@@ -1,8 +1,8 @@
 /* this is the file thats on the server running socket.io.
 * putting it here for version control and because ST2
 * is a way better IDE than vim. */
-var io = require('socket.io'),
-    express = require('express'),
+var io = require('C:\\Users\\IGEN721\\NODE\\node_modules\\socket.io'),
+    express = require('C:\\Users\\IGEN721\\NODE\\node_modules\\express'),
     app = express.createServer(),
     games = [];
 
@@ -10,26 +10,34 @@ fillGamesWithTestData();
 
 app
 	.configure(function () {
-
+		//app.enable( 'jsonp callback' );
 	})
 	.listen( 20080 );
 
-app.enable( 'jsonp callback' );
+app.get( '/*', function( req, res, next) {
+
+	res.header('Access-Control-Allow-Credentials', 'true');
+	if (req.headers.cookie) {
+		res.header('Access-Control-Allow-Origin', '*');
+		res.header('Access-Control-Allow-Credentials', 'true');
+	} else {
+		res.header('Access-Control-Allow-Origin', req.headers.origin);
+	}
+	next();
+});
 
 // TODO - The create game/room logic handling
-app.get( '/', function( req, res ) {
+app.get( '/', function( req, res, next ) {
 	var sio = io.listen(app);
-
 	sio.sockets.on('connection', function( socket ) {
-		//
+		console.log( 'on connection: sync.' );
 		socket.on( 'join game', function( data, callback ){
-			var game = {};
-			game.id = data.game.id;
-			game.location = data.game.location;
-			console.log( 'creating room ' + data.game.id );
-			socket.join( data.game.id );
+			var game = new Game( data );
+			console.log( 'creating room ' + game.id );
+			socket.join( game.id );
 		});
 	});
+	next();
 });
 
 app.get( '/games/location/:location', function( req, res ) {
@@ -112,6 +120,10 @@ app.get( '/games/id/:id', function( req, res ) {
 	response.games = respGames;
 	res.json( response );
 });
+
+function Game( data ) {
+	this = data.game;
+}
 
 function fillGamesWithTestData() {
 	var game1 = {};

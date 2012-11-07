@@ -1,6 +1,6 @@
 // Sets the require.js configuration for your application.
 require.config({
-  
+
   // 3rd party script alias names (Easier to type "jquery" than "libs/jquery-1.7.2.min")
   paths: {
 
@@ -11,7 +11,7 @@ require.config({
       "underscore": "libs/lodash",
       "backbone": "libs/backbone",
       "backbone.validateAll": "plugins/Backbone.validateAll",
-      "socket.io": "http://meowstep.com:20080/socket.io/socket.io.js"
+      "socket.io": "server/socket.io"
 
   },
 
@@ -30,7 +30,7 @@ require.config({
       "backbone.validateAll": ["backbone"]
 
   } // end Shim Configuration
-  
+
 });
 
 // Include Mobile Specific JavaScript files here (or inside of your Mobile router)

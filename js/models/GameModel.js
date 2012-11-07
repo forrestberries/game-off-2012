@@ -4,11 +4,11 @@ define(["jquery", "backbone"], function($, Backbone) {
 
         // Model Constructor
         initialize: function() {
-             
+
              this.deck = new Deck();
 
              this.location = new Location();
-             
+
              this.gameOptions = new GameOptions();
 
              this.czar = new Player();
@@ -23,7 +23,9 @@ define(["jquery", "backbone"], function($, Backbone) {
 
             currentRound: 0,
 
-            awesomePoints: 0
+            awesomePoints: 0,
+
+            name: ""
 
             // deck
 

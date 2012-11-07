@@ -1,4 +1,4 @@
-define(['jquery', 'backbone'], function($, Backbone){
+define(['jquery', 'backbone', 'socket.io'], function($, Backbone, Socket){
   var View = Backbone.View.extend({
 
     el: "section#main",
@@ -7,26 +7,12 @@ define(['jquery', 'backbone'], function($, Backbone){
       this.id = id;
       this.template = _.template( $("#game-view").html(), { id: id } );
 
-      //this.sync();
+      this.sync();
       this.render();
     },
 
     events: {
 
-    },
-
-    sync: function() {
-      this.socket = io.connect( 'http://meowstep.com:20080' );
-      /* HARD CODED, DELETE WHEN MODELS ARE FINISHED */
-      var player = {},
-          game = {};
-      player.name = 'bob';
-      game.players = [];
-      game.players.push( player );
-      /* END HARD CODED SECTION */
-      
-      this.socket.emit( 'join game', game, updateGame );
-      this.socket.on( 'join game', updateGame );
     },
 
     updateGame: function( data ) {
@@ -36,6 +22,21 @@ define(['jquery', 'backbone'], function($, Backbone){
     render: function() {
       this.$el.html(this.template);
       return this;
+    },
+
+    sync: function() {
+      console.log( 'GameView.sync()' );
+      this.socket = io.connect( 'http://localhost:20080' );
+      /* HARD CODED, DELETE WHEN MODELS ARE FINISHED */
+      var player = {},
+          game = {};
+      player.name = 'bob';
+      game.players = [];
+      game.players.push( player );
+      /* END HARD CODED SECTION */
+
+      this.socket.on( 'join game', this.updateGame );
+      this.socket.emit( 'join game', game, this.updateGame );
     }
   });
 
