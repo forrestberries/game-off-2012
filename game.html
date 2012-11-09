@@ -45,7 +45,15 @@
     <script id='game-view' type='text/template'>
     <div>Here is the GameView for game id: <%= id %></div>
     <input type='text' id='display-name' />
-    <a id='game-update'>Game Update</a>
+    <a id='game-update'>Game Update</a><br />
+    <table>
+      <% _.each(players.toJSON(), function(player, id) { %>
+        <tr class="props" data-id=<%= id %>>
+          <td data-prop="name">Name: <%= player.name %></td>
+          <td data-prop="socketid">Socket ID: <%= player.socketid %></td>
+        </tr>
+      <% }); %>
+    </table>
     </script>
 
   <!-- Prompt IE 6 users to install Chrome Frame. Remove this if you support IE 6.

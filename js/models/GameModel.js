@@ -4,14 +4,16 @@ define(["jquery", "backbone"], function($, Backbone) {
 
         // Model Constructor
         initialize: function() {
-
-             this.deck = new Deck();
+            //commenting out for now
+            //during debugging
+            //as more progress is made, will un comment
+             /*this.deck = new Deck();
 
              this.location = new Location();
 
              this.gameOptions = new GameOptions();
 
-             this.czar = new Player();
+             this.czar = new Player();*/
         },
 
         // Default values for all of the Game Model attributes

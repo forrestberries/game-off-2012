@@ -1,104 +1,128 @@
-define(['jquery', 'backbone', 'socket.io', 'collections/PlayersCollection', 'models/PlayerModel', 'models/LocationModel'], function($, Backbone, Socket, PlayersCollection, PlayerModel, LocationModel){
+define(['jquery', 'backbone', 'socket.io', 'collections/PlayersCollection', 'models/PlayerModel', 'models/LocationModel', 'models/GameModel'], function($, Backbone, Socket, PlayersCollection, PlayerModel, LocationModel, GameModel){
   var View = Backbone.View.extend({
 
     el: "section#main",
 
     initialize: function( id ) {
       console.log( 'GameView initialize()' );
-      this.id = id;
-      this.socket = {};
+      var self = this,
+          game = new GameModel( { id: id });
+      self.socket = {};
 
-      this.sync();
-      this.render();
+      var players = new PlayersCollection();
+
+      self.game = game;
+
+      players.on( 'add remove', function( data ) {
+        self.render();
+      });
+      players.on( 'remove', function( data ) {
+        //
+      });
+
+      console.log( '%cself', 'color: blue;' );
+      console.log( self );
+      self.game.set( { players: players } );
+      self.sync();
     },
 
     events: {
 
     },
 
-    updateGame: function( data ) {
-      console.log( 'client updating game' );
-      this.game = data;
-      console.log( '-----game-----' );
-      console.log( this.game );
+    playerCollectionChange: function( data ) {
+      console.info( 'Player Collection has been changed' );
+      console.log( data );
     },
 
     render: function() {
-      this.template = _.template( $("#game-view").html(), { id: this.id, players: this.players } );
+      console.log( 'render()' );
+      console.log( this );
+      var game = this.game;
+      this.template = _.template( $("#game-view").html(), { id: this.id, players: game.get( "players" ) } );
       this.$el.html(this.template);
       return this;
     },
 
-    handleNewPlayer: function( player ) {
-      this.game.players.push( player );
-      /*var p = new PlayerModel( player );
-      this.players.add( p );*/
-      console.log( '-----players-----' );
-      console.log( this.game.players );
-      this.socket.emit( 'join game', this.game );
-    },
-
-    joinOrCreateGame: function( game ) {
+    joinOrCreateGame: function() {
       console.log( 'GameView.joinOrCreateGame()' );
-      this.game = game;
-      this.socket.on('confirm', function(msg){console.log(msg.message);})
-      this.socket.emit( 'join game', game, this.updateGame );
-      this.socket.on( 'update room', this.updateGame );
-      this.socket.on( 'new player', function( player ) {
-        this.game.players.push( player );
-        /*var p = new PlayerModel( player );
-        this.players.add( p );*/
-        console.log( '-----players-----' );
-        console.log( this.game.players );
-        
+      var self = this;
 
-        this.emit( 'update room', this.game );
+
+      self.socket.emit( 'join game', self.game, function( data ) {
+        console.info( 'client updating game (response from server)' );
+
+        //AH HA!, when data comes back, needs to strip
+        //it all apart and new up Models individually, add to collection
+        //then put that collection as child of GameModel. WOO!
+        self.game = new GameModel( data );
+        console.log( '%c-----game-----', "color: blue;" );
+        console.log( self.game );
+        self.render();
+      });
+      self.socket.on( 'update room', function( data ) {
+        console.log( 'client updating game' );
+        console.log( self );
+        self.game = data;
+        console.log( '%c-----game-----', "color: blue;" );
+        console.log( self.game );
+        self.render( self );
+      });
+      self.socket.on( 'new player', function( player ) {
+        console.log( '%cself', 'color: yellow;' );
+        console.log( self );
+        console.log( 'A new player has arrived. adding ' );
+        var newPlayer = new PlayerModel( player );
+        console.log( 'old game: ' );
+        console.log( self.game );
+        self.game.get( "players" ).add( newPlayer );
+        console.log( "%c-----players-----", "color: blue;" );
+        console.log( self.game.get( 'players' ) );
+
+
+        this.emit( 'update room', self.game );
+      });
+      this.socket.on( 'player left', function( badsocketid ) {
+        console.clear();
+        console.log( badsocketid + ' left the game' );
+        var players = self.game.players,
+            newPlayers = [];
+        for(var i = 0; i < players.length; i++ ) {
+          if( players[i].socketid !== badsocketid ) {
+            newPlayers.push( players[i] );
+          }
+        }
+        self.game.players = newPlayers;
+        console.log( '-----players-----' );
+        console.log( self.game.players );
+      });
+      $( window ).bind( 'beforeunload', function() {
+        var socketid = self.player.socketid;
+        self.socket.emit( 'player left', self.game.id, socketid );
       });
     },
 
     sync: function() {
       console.log( 'GameView.sync()' );
-      var socket = io.connect( 'http://localhost:20080' );
-      this.socket = socket;
-      /* HARD CODED, DELETE WHEN MODEL CAN BE GRABBED FROM LOCAL STORAGE  */
-      var player = {},
-          game = {};
-      player.name = 'bob' + ( new Date().getSeconds() );
-      player.location = new LocationModel();
-      game.players = [];
-      game.id = this.id;
-      game.players.push( player );
-      /* END HARD CODED SECTION */
+      var socket = io.connect( 'http://localhost:20080' ),
+          self = this;
+      self.socket = socket;
+      var tempName = 'bob' + ( new Date().getMilliseconds() ),
+          location = new LocationModel(),
+          temporaryPlayer = new PlayerModel({
+        name: tempName
+      });
+      temporaryPlayer.on( 'change', function( data ) {
+        console.error( "I CHANGED IN ERROR" );
+      });
 
-      this.joinOrCreateGame( game );
+      self.game.get( "players" ).add( temporaryPlayer );
 
+      self.joinOrCreateGame();
+      console.log( self );
     }
   });
 
   // Returns the View class
   return View;
 });
-
-/*
-
-
-      var socket = io.connect( 'http://meowstep.com:20080' );
-      this.socket = socket;
-      this.socket.on( 'join game room', function( data ) {
-        console.log( 'join game room handler local hit' );
-        console.log( data.msg );
-      });
-
-    gameUpdate: function() {
-      var name = this.$el.find( '#display-name' ).val();
-      this.name = name;
-      var data = {
-        displayname: name,
-        game: 'room1'
-      };
-      this.data = data;
-      this.socket.emit( 'join game room', this.data, function( response ) {
-        console.log( response.msg );
-      });
-    },
-    */
