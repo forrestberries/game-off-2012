@@ -1,9 +1,10 @@
 /* this is the file thats on the server running socket.io.
 * putting it here for version control and because ST2
 * is a way better IDE than vim. */
-var io = require('C:\\Users\\IGEN721\\NODE\\node_modules\\socket.io'),
-    express = require('C:\\Users\\IGEN721\\NODE\\node_modules\\express'),
+var io = require('socket.io'),
+    express = require('express'),
     app = express.createServer(),
+    gameIds = {},
     games = [];
 
 fillGamesWithTestData();
@@ -11,8 +12,42 @@ fillGamesWithTestData();
 app
 	.configure(function () {
 		//app.enable( 'jsonp callback' );
+		app.use
 	})
 	.listen( 20080 );
+
+var sio = io.listen(app);
+
+/*SOCKETS :) */
+
+sio.sockets.on( 'connection', function( socket ) {
+	console.log( 'connection made!' );
+	socket.emit( 'confirm', { message: 'connection made'});
+	socket.on( 'update room', function( game ) {
+		console.log( 'update room request received for ' + game.id );
+		socket.broadcast.to( game.id ).emit( 'join game', game );	
+	});
+	socket.on( 'join game', function( game, callback ) {
+		//check if room exists
+		if( gameIds[game.id] ) {
+			console.log( 'Room already exists, do not use MY game obj, but update everyone with game object' );
+			console.log( 'and fetch me an updated one ' );
+			sio.sockets.in( game.id ).emit( 'new player', game.players[0]); //playerse[0] should be person that just joined.
+			socket.join( game.id );
+			
+		} else {
+			console.log( 'Room does not exists, use my game obj' );
+			gameIds[game.id] = true;
+			console.log( 'creating room ' + game.id );
+			socket.join( game.id );
+			console.log( 'Rooms available (and its members): ' );
+			console.log( sio.sockets.manager.rooms );
+			callback( game );
+		}
+	});
+});
+
+/* END SOCKETS :( */
 
 app.get( '/*', function( req, res, next) {
 
@@ -28,15 +63,14 @@ app.get( '/*', function( req, res, next) {
 
 // TODO - The create game/room logic handling
 app.get( '/', function( req, res, next ) {
-	var sio = io.listen(app);
-	sio.sockets.on('connection', function( socket ) {
+	/*sio.sockets.on('connection', function( socket ) {
 		console.log( 'on connection: sync.' );
 		socket.on( 'join game', function( data, callback ){
 			var game = new Game( data );
 			console.log( 'creating room ' + game.id );
 			socket.join( game.id );
 		});
-	});
+	});*/
 	next();
 });
 
@@ -120,10 +154,6 @@ app.get( '/games/id/:id', function( req, res ) {
 	response.games = respGames;
 	res.json( response );
 });
-
-function Game( data ) {
-	this = data.game;
-}
 
 function fillGamesWithTestData() {
 	var game1 = {};

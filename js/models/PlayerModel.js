@@ -5,9 +5,9 @@ define(["jquery", "backbone"], function($, Backbone) {
         // Model Constructor
         initialize: function() {
              
-             this.location = new Location();
+             /*this.location = new Location();
              
-             this.playerSettings = new PlayerSettings();
+             this.playerSettings = new PlayerSettings();*/
 
         },
 
@@ -27,8 +27,6 @@ define(["jquery", "backbone"], function($, Backbone) {
             whiteCards: [],
 
             blackCards: [],
-
-            id: "",
 
             cardsInPlay: []
 
