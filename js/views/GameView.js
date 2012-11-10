@@ -20,8 +20,6 @@ define(['jquery', 'backbone', 'socket.io', 'collections/PlayersCollection', 'mod
         //
       });
 
-      console.log( '%cself', 'color: blue;' );
-      console.log( self );
       self.game.set( { players: players } );
       self.sync();
     },
@@ -36,8 +34,10 @@ define(['jquery', 'backbone', 'socket.io', 'collections/PlayersCollection', 'mod
     },
 
     render: function() {
-      console.log( 'render()' );
+      console.group( 'render()' );
+      console.log( 'this is' );
       console.log( this );
+      console.groupEnd();
       var game = this.game;
       this.template = _.template( $("#game-view").html(), { id: this.id, players: game.get( "players" ) } );
       this.$el.html(this.template);
@@ -48,63 +48,80 @@ define(['jquery', 'backbone', 'socket.io', 'collections/PlayersCollection', 'mod
       console.log( 'GameView.joinOrCreateGame()' );
       var self = this;
 
-
       self.socket.emit( 'join game', self.game, function( data ) {
-        console.info( 'client updating game (response from server)' );
-
-        //AH HA!, when data comes back, needs to strip
-        //it all apart and new up Models individually, add to collection
-        //then put that collection as child of GameModel. WOO!
-        self.game = new GameModel( data );
+        //so this is only called if you're the first person
+        //to join a game
+        console.group( 'client updating game (response from server)', 'join game' );
+        /*self.game.get( 'players' ).each(function(model) { model.destroy(); } );*/
+        var newPlayers = data.players,
+            newPlayersCollection = new PlayersCollection();
+        for( var i = 0; i < newPlayers.length; i++ ) {
+          newPlayersCollection.add( new PlayerModel( newPlayers[i] ) );
+        }
+        self.player = new PlayerModel( data.players[0] );
+        newPlayersCollection.on( 'add remove', function() { self.render(); } );
+        var newGame = new GameModel( data );
+        newGame.set( { players: newPlayersCollection } );
+        self.game = newGame;
         console.log( '%c-----game-----', "color: blue;" );
         console.log( self.game );
+        console.groupEnd();
         self.render();
       });
       self.socket.on( 'update room', function( data ) {
-        console.log( 'client updating game' );
+        console.group( 'client updating game' );
         console.log( self );
-        self.game = data;
+
+        var newPlayers = data.players,
+            newPlayersCollection = new PlayersCollection();
+        for( var i = 0; i < newPlayers.length; i++ ) {
+          newPlayersCollection.add( new PlayerModel( newPlayers[i] ) );
+        }
+        newPlayersCollection.on( 'add remove', function() { self.render(); } );
+        var newGame = new GameModel( data );
+        newGame.set( { players: newPlayersCollection } );
+        self.game = newGame;
+
         console.log( '%c-----game-----', "color: blue;" );
         console.log( self.game );
-        self.render( self );
+        console.groupEnd();
+        self.render();
       });
       self.socket.on( 'new player', function( player ) {
-        console.log( '%cself', 'color: yellow;' );
-        console.log( self );
+        console.group( '%cNew Player', 'color: green;' );
         console.log( 'A new player has arrived. adding ' );
         var newPlayer = new PlayerModel( player );
-        console.log( 'old game: ' );
-        console.log( self.game );
+        if( !self.player ) {
+          console.log( 'it was you.' );
+          self.player = newPlayer;
+        }
+        console.log( 'old players: ' );
+        console.log( self.game.get( 'players' ) );
         self.game.get( "players" ).add( newPlayer );
         console.log( "%c-----players-----", "color: blue;" );
         console.log( self.game.get( 'players' ) );
-
+        console.groupEnd();
 
         this.emit( 'update room', self.game );
       });
       this.socket.on( 'player left', function( badsocketid ) {
-        console.clear();
         console.log( badsocketid + ' left the game' );
-        var players = self.game.players,
-            newPlayers = [];
-        for(var i = 0; i < players.length; i++ ) {
-          if( players[i].socketid !== badsocketid ) {
-            newPlayers.push( players[i] );
+        self.game.get( 'players' ).each( function( model ) {
+          if( model.get( 'socketid' ) === badsocketid ) {
+            model.destroy();
           }
-        }
-        self.game.players = newPlayers;
+        });
         console.log( '-----players-----' );
-        console.log( self.game.players );
+        console.log( self.game.get( 'players' ) );
+
+        this.emit( 'update server listing', self.game );
       });
-      $( window ).bind( 'beforeunload', function() {
-        var socketid = self.player.socketid;
-        self.socket.emit( 'player left', self.game.id, socketid );
-      });
+      
     },
 
     sync: function() {
       console.log( 'GameView.sync()' );
-      var socket = io.connect( 'http://localhost:20080' ),
+      var socket = io.connect( 'http://meowstep.com:20080' ),
           self = this;
       self.socket = socket;
       var tempName = 'bob' + ( new Date().getMilliseconds() ),
@@ -115,11 +132,9 @@ define(['jquery', 'backbone', 'socket.io', 'collections/PlayersCollection', 'mod
       temporaryPlayer.on( 'change', function( data ) {
         console.error( "I CHANGED IN ERROR" );
       });
-
       self.game.get( "players" ).add( temporaryPlayer );
 
       self.joinOrCreateGame();
-      console.log( self );
     }
   });
 

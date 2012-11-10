@@ -11,8 +11,8 @@ require.config({
       "underscore": "libs/lodash",
       "backbone": "libs/backbone",
       "backbone.validateAll": "plugins/Backbone.validateAll",
-      "socket.io": "server/socket.io"
-
+      "socket.io": "server/socket.io",
+      "canary-util": "plugins/canary-util"
   },
 
   // Sets the configuration for your third party scripts that are not AMD compatible
@@ -27,14 +27,16 @@ require.config({
       },
 
       // Backbone.validateAll depends on Backbone.
-      "backbone.validateAll": ["backbone"]
+      "backbone.validateAll": ["backbone"],
+
+      "canary-util": []
 
   } // end Shim Configuration
 
 });
 
 // Include Mobile Specific JavaScript files here (or inside of your Mobile router)
-require(['modernizr','jquery','backbone','routers/homeRouter', 'routers/gameRouter','bootstrap','backbone.validateAll'], function(Modernizr, $, Backbone, HomeRouter, GameRouter) {
+require(['modernizr','jquery','backbone','routers/homeRouter', 'routers/gameRouter','bootstrap','backbone.validateAll', 'plugins/canary-util'], function(Modernizr, $, Backbone, HomeRouter, GameRouter) {
 
   // Instantiates a new Router
   if( document.URL.indexOf( 'index.html' ) > -1 ) {

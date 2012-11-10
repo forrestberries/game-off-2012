@@ -1,11 +1,11 @@
 /* this is the file thats on the server running socket.io.
 * putting it here for version control and because ST2
 * is a way better IDE than vim. */
-var io = require('C:\\Users\\IGEN721\\NODE\\node_modules\\socket.io'),
-    express = require('C:\\Users\\IGEN721\\NODE\\node_modules\\express'),
+var io = require('socket.io'),
+    express = require('express'),
     app = express.createServer(),
-    gameIds = {},
-    games = [];
+    games = {},
+    fakeGameArray = [];
 
 fillGamesWithTestData();
 
@@ -17,44 +17,64 @@ app
 	.listen( 20080 );
 
 var sio = io.listen(app);
+//some room clean up every 1.5 seconds
+(function(){
+	var rooms = sio.sockets.manager.rooms;
+  for( var key in games ) {
+		if( games.hasOwnProperty( key ) ) {
+			var aRoom = rooms[ '/' + games[key].id];
+			if( !aRoom ) {
+				delete games[key]
+			}
+		}
+	}
+  setTimeout(arguments.callee,1500);
+})();
 
 /*SOCKETS :) */
 
 sio.sockets.on( 'connection', function( socket ) {
-	console.log( 'connection made!' );
+
+
 	socket.on( 'update room', function( game ) {
 		console.log( 'update room request received for ' + game.id );
-		//socket.broadcast.to( game.id ).emit( 'join game', game );
+		games[game.id] = game;
 		sio.sockets.in( game.id ).emit( 'update room', game );
 	});
-	socket.on( 'player left', function( gameid, socketid ) {
-		console.log( 'client ' + socketid + ' disconnect from ' + gameid );
-		sio.sockets.in( gameid ).emit( 'player left', socketid );
+
+	socket.on( 'update server listing', function( game ) {
+		games[game.id] = game;
 	});
+
+	socket.on( 'disconnect', function() {
+		console.log( 'client ' + socket.id + ' disconnected' );
+	//TODO, right now this is emitting to all rooms, dunno how else to do it.
+		sio.sockets.emit( 'player left', socket.id );
+	});
+
 	socket.on( 'join game', function( game, callback ) {
 		console.log( '++++++++++++GAME+++++++++++' );
 		console.log( game );
 		//check if room exists
-		if( gameIds[game.id] ) {
+		if( games[game.id] ) {
 			console.log( 'Room already exists' );
 			//playerse[0] should be person that just joined.
 			game.players[0].socketid = socket.id;
-			console.log( game.players[0] );
 			sio.sockets.in( game.id ).emit( 'new player', game.players[0]);
 			socket.join( game.id );
-
 		} else {
 			console.log( 'Room does not exists, use my game obj' );
 			game.players[0].socketid = socket.id;
-			console.log( game.players[0] );
-			gameIds[game.id] = true;
 			console.log( 'creating room ' + game.id );
 			//since its a new game, player[0] should be only player
 			socket.join( game.id );
 			console.log( 'Rooms available (and its members): ' );
 			console.log( sio.sockets.manager.rooms );
 			callback( game );
+
+			games[game.id] = game;
 		}
+		socket.set( "gameid", game.id );
 	});
 });
 
@@ -95,17 +115,18 @@ app.get( '/games/location/:location', function( req, res ) {
 			distance = Math.round( distance * 100 ) / 100; //round to 2 decimal places
 			gameObj.miles = distance;
 			gameObj.feet = Math.round( ( distance * 5280 ) * 100 ) / 100; //round to 2 decimal places
-			gameObj.game = games[i];
+			gameObj.game = fakeGameArray[i];
 			respGames.push( gameObj );
 		}
-		if( i === ( games.length - 1 ) ) {
+		if( i === ( fakeGameArray.length - 1 ) ) {
 			responseFinished();
 		}
 	};
 
-	for( i = 0; i < games.length; i++ ) {
+	for( i = 0; i < fakeGameArray.length; i++ ) {
 		/*
-		* for more info on this nonsense, see http://en.wikipedia.org/wiki/Haversine_formula
+		* for more info on this nonsense, 
+		* see http://en.wikipedia.org/wiki/Haversine_formula
 		* Shamelessly stolen from SO
 		*/
 		( function( game, location, i, callback ) {
@@ -127,16 +148,19 @@ app.get( '/games/location/:location', function( req, res ) {
 					c = 2 * Math.atan2( Math.sqrt( a ), Math.sqrt( 1-a ) );
 			var dist = R * c * 0.621371; // Distance in miles
 			callback( i, dist );
-		})( games[i], location, i, calculateCallback );
+		})( fakeGameArray[i], location, i, calculateCallback );
 	}
 });
 
 app.get( '/games', function( req, res ) {
 	var response = {};
 	response.games = [];
-	for( i = 0; i < games.length; i++ ) {
-		response.games.push( games[i] );
+	for( var key in games ) {
+		if( games.hasOwnProperty( key ) ) {
+			response.games.push( games[key] );
+		}
 	}
+
 	res.json( response );
 });
 
@@ -146,11 +170,13 @@ app.get( '/games/id/:id', function( req, res ) {
 			response = {},
 			respGames = [];
 
-	for( i = 0; i < games.length; i++ ) {
-		var currentGame = games[i];
-		if( currentGame.id == id ) {
-			respGames.push( currentGame );
-			break;
+	for( var key in games ) {
+		if( games.hasOwnProperty( key ) ) {
+			var currentGame = games[key];
+			if( currentGame.id == id ) {
+				respGames.push( currentGame );
+				break;
+			}
 		}
 	}
 	response.games = respGames;
@@ -164,7 +190,7 @@ function fillGamesWithTestData() {
 	game1.id = 1;
 	game1.location.lat = '41.250545';
 	game1.location.lon = '-96.01308';
-	games.push( game1 );
+	fakeGameArray.push( game1 );
 
 	var game2 = {};
 	game2.location = {};
@@ -172,7 +198,7 @@ function fillGamesWithTestData() {
 	game2.id = 2;
 	game2.location.lat = '41.250540';
 	game2.location.lon = '-96.01300';
-	games.push( game2 );
+	fakeGameArray.push( game2 );
 
 	var game3 = {};
 	game3.location = {};
@@ -180,7 +206,7 @@ function fillGamesWithTestData() {
 	game3.id = 3;
 	game3.location.lat = '41.200000';
 	game3.location.lon = '-96.01330';
-	games.push( game3 );
+	fakeGameArray.push( game3 );
 
 	var game4 = {};
 	game4.location = {};
@@ -188,7 +214,7 @@ function fillGamesWithTestData() {
 	game4.id = 4;
 	game4.location.lat = '41.204999';
 	game4.location.lon = '-96.01330';
-	games.push( game4 );
+	fakeGameArray.push( game4 );
 
 	var game5 = {};
 	game5.location = {};
@@ -196,7 +222,7 @@ function fillGamesWithTestData() {
 	game5.id = 5;
 	game5.location.lat = '41.251000';
 	game5.location.lon = '-96.01310';
-	games.push( game5 );
+	fakeGameArray.push( game5 );
 
 	var game6 = {};
 	game6.location = {};
@@ -204,6 +230,6 @@ function fillGamesWithTestData() {
 	game6.id = 6;
 	game6.location.lat = '41.250530';
 	game6.location.lon = '-96.01430';
-	games.push( game6 );
+	fakeGameArray.push( game6 );
 }
 
