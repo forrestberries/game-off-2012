@@ -1,4 +1,7 @@
-define(["jquery", "backbone"], function($, Backbone) {
+define(["jquery", 
+    "backbone", 
+    "models/LocationModel", 
+    "models/PlayerSettingsModel"], function($, Backbone, Location, PlayerSettings) {
 
     var Player = Backbone.Model.extend({
 
