@@ -1,16 +1,12 @@
-define(["jquery", 
-    "backbone", 
-    "models/LocationModel", 
-    "models/PlayerSettingsModel"], function($, Backbone, Location, PlayerSettings) {
+define(["jquery",
+    "backbone"], function($, Backbone) {
 
     var Player = Backbone.Model.extend({
 
         // Model Constructor
         initialize: function() {
-             
-             /*this.location = new Location();
-             
-             this.playerSettings = new PlayerSettings();*/
+
+             //this.playerSettings = new PlayerSettings();
 
         },
 
@@ -35,11 +31,7 @@ define(["jquery",
 
             blackCards: [],
 
-            id: "",
-
             cardsInPlay: []
-
-            // location
 
             // playerSettings
 

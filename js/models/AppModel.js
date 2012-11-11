@@ -5,11 +5,11 @@ define(["jquery", "backbone"], function($, Backbone) {
         // Model Constructor
         initialize: function() {
              
-             this.player = new Player();
+             /*this.player = new Player();
 
              this.game = new Game();
 
-             this.gameOptions = new GameOptions();
+             this.gameOptions = new GameOptions();*/
 
         },
 

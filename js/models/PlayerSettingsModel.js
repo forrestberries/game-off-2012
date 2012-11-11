@@ -4,14 +4,14 @@ define(["jquery", "backbone"], function($, Backbone) {
 
         // Model Constructor
         initialize: function() {
-             
+
 
         },
 
         // Default values for all of the PlayerSettings Model attributes
         defaults: {
 
-            displayName: false,
+            displayName: '',
 
             customDecks: [],
 

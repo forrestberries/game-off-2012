@@ -1,24 +1,26 @@
 
-define(["jquery", 
-    "backbone", 
-    "models/DeckModel", 
-    "models/LocationModel", 
-    "models/GameOptionsModel",
-    "models/PlayerModel"], function($, Backbone, Deck, Location, GameOptions, Player) {
+define(["jquery",
+    "backbone",
+    "models/LocationModel"], function($, Backbone, Location) {
 
     var Game = Backbone.Model.extend({
 
         // Model Constructor
         initialize: function() {
 
+            this.set({ location: new Location() });
+            //this.location = new Location();
+
+            //this.location.on('change', function() { console.log(this.location); });
              /*this.deck = new Deck();
 
-             this.location = new Location();
 
              this.gameOptions = new GameOptions();
 
              this.czar = new Player();*/
         },
+
+
 
         // Default values for all of the Game Model attributes
         defaults: {
@@ -31,7 +33,9 @@ define(["jquery",
 
             awesomePoints: 0,
 
-            name: ""
+            name: "",
+
+            location: {}
 
             // deck
 

@@ -5,7 +5,7 @@ define(["jquery", "backbone"], function($, Backbone) {
         // Model Constructor
         initialize: function() {
              
-             this.blackCard = new BlackCard();
+             /*this.blackCard = new BlackCard();*/
 
         },
 

@@ -99,7 +99,7 @@ app.get( '/', function( req, res, next ) {
 app.get( '/games/location/:location', function( req, res ) {
 	console.log( 'request for games near location ' + req.params.location );
 	var location = req.params.location.split( ',' ),
-			distanceThreshhold = 2,
+			distanceThreshhold = 2, // miles
 			respGames = [];
 
 	var responseFinished = function() {
@@ -125,7 +125,7 @@ app.get( '/games/location/:location', function( req, res ) {
 
 	for( i = 0; i < fakeGameArray.length; i++ ) {
 		/*
-		* for more info on this nonsense, 
+		* for more info on this nonsense,
 		* see http://en.wikipedia.org/wiki/Haversine_formula
 		* Shamelessly stolen from SO
 		*/
