@@ -1,11 +1,13 @@
-define(['jquery', 'backbone', 'models/GameModel', 'models/PlayerSettingsModel'], function($, Backbone, Game, PlayerSettings){
+define(['jquery', 
+  'backbone', 
+  'models/GameModel', 
+  'models/PlayerSettingsModel',
+  'text!templates/home.html'], function($, Backbone, Game, PlayerSettings, homeHTML){
   var View = Backbone.View.extend({
 
     el: "section#main",
 
     initialize: function() {
-      // Setting the view's template property
-      this.template = _.template( $("#home-view").html() );
       
     },
 
@@ -17,7 +19,6 @@ define(['jquery', 'backbone', 'models/GameModel', 'models/PlayerSettingsModel'],
     createGame: function() {
         var dispName = $("#displayName").val();
         if(dispName === null || dispName === "") {
-
           $(".errors").text('Display Name must not be empty!');
           $("#displayName").focus();
           return;
@@ -32,17 +33,12 @@ define(['jquery', 'backbone', 'models/GameModel', 'models/PlayerSettingsModel'],
         console.log('forwarding ' + game.name + ' to ' + window.location);
     },
 
+    joinGame: function() { 
+
+    },
+
     render: function() {
-      this.$el.html(this.template);
-
-      $("#new-game-modal").on("hidden", function() {
-          // Clear's any error messages
-          $(".errors").empty();
-          console.log('modal is hidden');
-
-      });
-      console.log($("#new-game-modal"));
-
+      this.$el.html(homeHTML);
       return this;
     }
   });

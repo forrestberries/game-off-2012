@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 define(["jquery", 
     "backbone", 
     "models/LocationModel", 
@@ -9,14 +8,18 @@ define(["jquery",
         // Model Constructor
         initialize: function() {
              
-             this.location = new Location();
+             /*this.location = new Location();
              
-             this.playerSettings = new PlayerSettings();
+             this.playerSettings = new PlayerSettings();*/
 
         },
 
         // Default values for all of the Player Model attributes
         defaults: {
+
+            name: "",
+
+            socketid: "",
 
             isCzar: false,
 
@@ -48,54 +51,3 @@ define(["jquery",
     return Player;
 
 });
-
-=======
-define(["jquery", "backbone"], function($, Backbone) {
-
-    var Player = Backbone.Model.extend({
-
-        // Model Constructor
-        initialize: function() {
-
-             /*this.location = new Location();
-
-             this.playerSettings = new PlayerSettings();*/
-
-        },
-
-        // Default values for all of the Player Model attributes
-        defaults: {
-            name: "",
-
-            socketid: "",
-
-            isCzar: false,
-
-            isGambling: false,
-
-            isWinner: false,
-
-            hasPlayed: false,
-
-            awesomePoints: 0,
-
-            whiteCards: [],
-
-            blackCards: [],
-
-            cardsInPlay: []
-
-            // location
-
-            // playerSettings
-
-        }
-
-    });
-
-    // Returns the Model class
-    return Player;
-
-});
-
->>>>>>> 3b91ef5569f79f5449c3919d70eff9ef84cdd8a7
