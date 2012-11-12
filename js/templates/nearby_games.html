@@ -1,0 +1,22 @@
+<div class="search">
+  <div class="modal hide fade in" id="nearby-games-modal" tabindex="-1" role="dialog" aria-labelledby="nearbyGamesLabel" aria-hidden="true">
+      <div class="modal-header">
+          <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+          <h3 id="nearbyGamesLabel">Local Games</h3>
+      </div>
+      <div class="modal-body">
+        <label for="displayNameJoinNearby">Display Name</label>
+        <input type="text" id="displayNameJoinNearby" name="displayNameJoinNearby">
+        <br />
+        <p>Choose a game to join!</p>
+        <form id="join-game-nearby">
+
+          <span class="errors" style="color:red;"></span>
+        </form>
+      </div>
+      <div class="modal-footer">
+          <button class="btn" id="close" data-dismiss="modal" aria-hidden="true">Close</button>
+          <button class="btn btn-primary" id="joinNearby">Join Game</button>
+      </div>
+  </div>
+</div>

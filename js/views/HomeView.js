@@ -2,9 +2,9 @@ define(['jquery',
   'backbone',
   'models/GameModel',
   'models/PlayerSettingsModel',
-  'collections/PlayersCollection',
   'models/PlayerModel',
-  'text!templates/home.html'], function($, Backbone, Game, PlayerSettings, PlayersCollection, Player, homeHTML){
+  'collections/PlayersCollection',
+  'text!templates/home.html'], function($, Backbone, Game, PlayerSettings, Player, PlayersCollection, homeHTML){
   var View = Backbone.View.extend({
 
     el: "section#main",
@@ -20,35 +20,61 @@ define(['jquery',
     },
 
     events: {
-      "click #create": "createGame"
+      "click #create": "createGame",
+      "click #joinId": "joinById"
     },
 
     // creates a new game
     createGame: function() {
-        var dispName = $("#displayName").val();
+        var dispName = $("#displayNameCreate").val();
         if(dispName === null || dispName === "") {
           $(".errors").text('Display Name must not be empty!');
-          $("#displayName").focus();
+          $("#displayNameCreate").focus();
           return;
         }
+        return this.startGame(dispName, this.generateGameID());
+    },
 
-        this.playerSettings.set( { displayName: dispName });
-        this.player.set( { name: dispName });
-        var playersCollection = new PlayersCollection(this.player);
+    // joinById acts like createGame but uses a set ID rather than an auto generated
+    joinById: function() {
+      var dispName = $("#displayNameJoin").val();
+      if(dispName === null || dispName === "") {
+        $(".errors").text('Display Name must not be empty!');
+        $("#displayNameJoin").focus();
+        return;
+      }
+      // parse game ID
+      var gameId = $('#gameID').val();
+      if(gameId === null || gameId === "") {
+        $(".errors").text('Game ID must not be empty!');
+        $("#gameID").focus();
+        return;
+      }
+      return this.startGame(dispName, gameId);
 
-        this.game.set({
-          id : this.generateGameID(),
-          name : 'Created by: ' + this.player.get('name'),
-          players: playersCollection
-        });
+    },
 
-        console.log(this.game);
+    startGame: function(dispName, gameId) {
+      // initialize player settings
+      this.playerSettings.set( { displayName: dispName });
+      this.player.set( { name: this.playerSettings.get('displayNameJoin') });
+      var playersCollection = new PlayersCollection(this.player);
 
-        localStorage.setItem('playerSettings', JSON.stringify(this.playerSettings));
-        localStorage.setItem('game', JSON.stringify(this.game));
+      // initialize Game object
+      this.game.set({
+        id : gameId,
+        name : this.player.get('name'),
+        players: playersCollection
+      });
 
-        window.location = 'game.html#/id/' + this.game.id;
-        console.log('forwarding ' + this.game.get('name') + ' to ' + window.location);
+      // ideally, we'll store custom settings in localStorage
+      // so that users don't need to keep entering things like
+      // their display name, etc.
+      localStorage.setItem('playerSettings', JSON.stringify(this.playerSettings));
+      localStorage.setItem('game', JSON.stringify(this.game));
+
+      // foward user to the GameView (router will pick up this request)
+      window.location = 'game.html#/id/' + this.game.id;
     },
 
     joinGame: function() {
@@ -60,18 +86,41 @@ define(['jquery',
 
     render: function() {
       this.$el.html(homeHTML);
+
+      // load in player name into the fields for the user
       var localPlayer = JSON.parse(localStorage.getItem('playerSettings'));
       if(localPlayer) {
-        $("#displayName").val(localPlayer.displayName);
+        $("#displayNameCreate").val(localPlayer.displayName);
+        $("#displayNameJoin").val(localPlayer.displayName);
       }
+
+      // clear errors on new modal, set proper focus location
+      $("#new-game-modal").on('shown', function() {
+        $('.errors').empty();
+        $('#displayNameCreate').focus();
+      });
+      $("#join-game-id-modal").on('shown', function() {
+        $('.errors').empty();
+        if(localPlayer)
+          $("#gameID").focus();
+        else
+          $("#displayNameJoin").focus();
+      });
+
       return this;
     },
 
     generateGameID: function() {
       var length = 5;
+      return this.randomString(length);
+    },
+
+    // utility function to return a randomized string
+    // taken from user sarsar on http://stackoverflow.com/questions/6860853/generate-random-string-for-div-id
+    randomString: function(length) {
       var chars = '0123456789ABCDEFGHIJKLMNOPQRSTUVWXTZabcdefghiklmnopqrstuvwxyz'.split('');
 
-      if (! length) {
+      if (!length) {
           length = Math.floor(Math.random() * chars.length);
       }
 

@@ -1,42 +1,45 @@
 <div id='home-view' class='home-view'>
   <div>
-    <a href="#new-game-modal" role="button" class="btn" data-toggle="modal" id='create-game'>Create Game</a>
+    <a href="#new-game-modal" role="button" class="btn" data-toggle="modal">Create Game</a>
   </div>
   <div class='join-game'>
     <div>
-      <button class="btn btn-large" id='nearby' type="button">Join Game Nearby</button>
+      <a href="#join-game-nearby" role="button" class="btn btn-large">Join Game Nearby</a>
     </div>
     <div>
-      <button class="btn btn-large" id='byid' type="button">Join Game By Id</button>
+      <a href="#join-game-id-modal" role="button" data-toggle="modal" class="btn btn-large">Join Game By Id</a>
     </div>
   </div>
-  <div class="modal hide fade in" id="new-game-modal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+  <div class="modal hide fade" id="new-game-modal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
       <div class="modal-header">
           <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
           <h3 id="myModalLabel">Create New Game</h3>
       </div>
       <div class="modal-body">
         <form id="new-game">
-          <label for="displayName">Display Name</label>
-          <input type="text" id="displayName" name="displayName"><br />
+          <label for="displayNameCreate">Display Name</label>
+          <input type="text" id="displayNameCreate" name="displayNameCreate"><br />
           <br />
           <span class="errors" style="color:red;"></span>
         </form>
       </div>
       <div class="modal-footer">
-          <button class="btn" id="close" data-dismiss="modal" aria-hidden="true">Close</button>
+          <button class="btn" id="closed" data-dismiss="modal" aria-hidden="true">Close</button>
           <button class="btn btn-primary" id="create">Create New Game</button>
       </div>
   </div>
-  <div class="modal hide fade in" id="join-game-id-modal" tabindex="-1" role="dialog" aria-labelledby="joinByIDLabel" aria-hidden="true">
+  <div class="modal hide fade" id="join-game-id-modal" tabindex="-1" role="dialog" aria-labelledby="joinByIDLabel" aria-hidden="true">
       <div class="modal-header">
           <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
           <h3 id="joinByIDLabel">Join Game By ID</h3>
       </div>
       <div class="modal-body">
+        <label for="displayNameJoin">Display Name</label>
+        <input type="text" id="displayNameJoin" name="displayNameJoin">
+        <br />
         <p>Enter in a game ID to join, or paste in shared URL!</p>
         <form id="join-game-id">
-          <label for="displayName">Game ID or URL:</label>
+          <label for="gameID">Game ID or URL:</label>
           <input type="text" id="gameID" name="gameID"><br />
           <br />
           <span class="errors" style="color:red;"></span>
@@ -44,7 +47,7 @@
       </div>
       <div class="modal-footer">
           <button class="btn" id="close" data-dismiss="modal" aria-hidden="true">Close</button>
-          <button class="btn btn-primary" id="join">Join Game</button>
+          <button class="btn btn-primary" id="joinId">Join Game</button>
       </div>
   </div>
 </div>
