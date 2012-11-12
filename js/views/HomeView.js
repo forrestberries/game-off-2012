@@ -32,27 +32,10 @@ define(['jquery',
           $("#displayNameCreate").focus();
           return;
         }
-
-        this.playerSettings.set( { displayName: dispName });
-        this.player.set( { name: this.playerSettings.get('displayName') });
-        var playersCollection = new PlayersCollection(this.player);
-
-        this.game.set({
-          id : this.generateGameID(),
-          name : 'Created by: ' + this.player.get('name'),
-          players: playersCollection
-        });
-
-        // ideally, we'll store custom settings in localStorage
-        // so that users don't need to keep entering things like
-        // their display name, etc.
-        localStorage.setItem('playerSettings', JSON.stringify(this.playerSettings));
-        localStorage.setItem('game', JSON.stringify(this.game));
-
-        // foward user to the GameView (router will pick up this request)
-        window.location = 'game.html#/id/' + this.game.id;
+        return this.startGame(dispName, this.generateGameID());
     },
 
+    // joinById acts like createGame but uses a set ID rather than an auto generated
     joinById: function() {
       var dispName = $("#displayNameJoin").val();
       if(dispName === null || dispName === "") {
@@ -67,14 +50,20 @@ define(['jquery',
         $("#gameID").focus();
         return;
       }
+      return this.startGame(dispName, gameId);
 
+    },
+
+    startGame: function(dispName, gameId) {
+      // initialize player settings
       this.playerSettings.set( { displayName: dispName });
       this.player.set( { name: this.playerSettings.get('displayNameJoin') });
       var playersCollection = new PlayersCollection(this.player);
 
+      // initialize Game object
       this.game.set({
         id : gameId,
-        name : 'Joined by: ' + this.player.get('name'),
+        name : this.player.get('name'),
         players: playersCollection
       });
 
@@ -97,22 +86,27 @@ define(['jquery',
 
     render: function() {
       this.$el.html(homeHTML);
+
+      // load in player name into the fields for the user
       var localPlayer = JSON.parse(localStorage.getItem('playerSettings'));
       if(localPlayer) {
         $("#displayNameCreate").val(localPlayer.displayName);
         $("#displayNameJoin").val(localPlayer.displayName);
       }
+
+      // clear errors on new modal, set proper focus location
       $("#new-game-modal").on('shown', function() {
-        console.log('new game modal opened');
+        $('.errors').empty();
         $('#displayNameCreate').focus();
       });
       $("#join-game-id-modal").on('shown', function() {
-        console.log('join game by id modal opened');
+        $('.errors').empty();
         if(localPlayer)
           $("#gameID").focus();
         else
           $("#displayNameJoin").focus();
       });
+
       return this;
     },
 
@@ -122,10 +116,11 @@ define(['jquery',
     },
 
     // utility function to return a randomized string
+    // taken from user sarsar on http://stackoverflow.com/questions/6860853/generate-random-string-for-div-id
     randomString: function(length) {
       var chars = '0123456789ABCDEFGHIJKLMNOPQRSTUVWXTZabcdefghiklmnopqrstuvwxyz'.split('');
 
-      if (! length) {
+      if (!length) {
           length = Math.floor(Math.random() * chars.length);
       }
 

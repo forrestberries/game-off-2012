@@ -6,7 +6,7 @@ define(['jquery',
     el: "section#main",
 
     initialize: function() {
-
+      console.log('initializing Nearby Games Search view');
     },
 
     events: {
@@ -14,6 +14,7 @@ define(['jquery',
 
     render: function() {
       this.$el.html(modalHTML);
+      $("#nearby-games-modal").modal('show');
       return this;
     }
   });
