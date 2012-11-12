@@ -25,7 +25,8 @@ var sio = io.listen(app);
 		if( games.hasOwnProperty( key ) ) {
 			var aRoom = rooms[ '/' + games[key].id];
 			if( !aRoom ) {
-				delete games[key]
+				delete games[key];
+				gamesInProgress--;
 			}
 		}
 	}
@@ -74,6 +75,7 @@ sio.sockets.on( 'connection', function( socket ) {
 			callback( game );
 
 			games[game.id] = game;
+			gamesInProgress++;
 		}
 		socket.set( "gameid", game.id );
 	});
@@ -109,21 +111,21 @@ app.get( '/games/location/:location', function( req, res ) {
 		response.games = respGames;
 		res.json( response );
 	},
-	calculateCallback = function( i, distance ) {
-		var gameObj = {},
-				count = 0;
+	calculateCallback = function( i, distance, validGame ) {
+		var gameObj = {};
 
 		if( distance <= distanceThreshhold ) {
 			distance = Math.round( distance * 100 ) / 100; //round to 2 decimal places
 			gameObj.miles = distance;
 			gameObj.feet = Math.round( ( distance * 5280 ) * 100 ) / 100; //round to 2 decimal places
-			gameObj.game = fakeGameArray[i];
+			gameObj.game = validGame;
 			respGames.push( gameObj );
 		}
-		if( i === ( fakeGameArray.length - 1 ) ) {
+		if( i === gamesInProgress ) {
 			responseFinished();
 		}
-	};
+	},
+	count = 0;
 
 	for( var key in games ) {
 		if( games.hasOwnProperty( key ) ) {
@@ -140,8 +142,8 @@ app.get( '/games/location/:location', function( req, res ) {
 				}
 				var lat = parseFloat( location[0] ),
 						lon = parseFloat( location[1] ),
-						gameLat = parseFloat( game.location.lat ),
-						gameLon = parseFloat( game.location.lon ),
+						gameLat = parseFloat( game.location.latitude ),
+						gameLon = parseFloat( game.location.longitude ),
 						R = 6371, // Radius of the earth in km
 						dLat = ( Math.abs( gameLat - lat ) ).toRad(),
 						dLon = ( Math.abs( gameLon - lon ) ).toRad(),
@@ -150,8 +152,8 @@ app.get( '/games/location/:location', function( req, res ) {
 								Math.sin( dLon/2 ) * Math.sin( dLon/2 ),
 						c = 2 * Math.atan2( Math.sqrt( a ), Math.sqrt( 1-a ) );
 				var dist = R * c * 0.621371; // Distance in miles
-				callback( i, dist );
-			})( fakeGameArray[i], location, i, calculateCallback );
+				callback( i, dist, game );
+			})( games[key], location, ++count, calculateCallback );
 		}
 	}
 });
