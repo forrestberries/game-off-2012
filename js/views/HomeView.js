@@ -2,9 +2,9 @@ define(['jquery',
   'backbone',
   'models/GameModel',
   'models/PlayerSettingsModel',
-  'collections/PlayersCollection',
   'models/PlayerModel',
-  'text!templates/home.html'], function($, Backbone, Game, PlayerSettings, PlayersCollection, Player, homeHTML){
+  'collections/PlayersCollection',
+  'text!templates/home.html'], function($, Backbone, Game, PlayerSettings, Player, PlayersCollection, homeHTML){
   var View = Backbone.View.extend({
 
     el: "section#main",
@@ -20,20 +20,21 @@ define(['jquery',
     },
 
     events: {
-      "click #create": "createGame"
+      "click #create": "createGame",
+      "click #joinId": "joinById"
     },
 
     // creates a new game
     createGame: function() {
-        var dispName = $("#displayName").val();
+        var dispName = $("#displayNameCreate").val();
         if(dispName === null || dispName === "") {
           $(".errors").text('Display Name must not be empty!');
-          $("#displayName").focus();
+          $("#displayNameCreate").focus();
           return;
         }
 
         this.playerSettings.set( { displayName: dispName });
-        this.player.set( { name: dispName });
+        this.player.set( { name: this.playerSettings.get('displayName') });
         var playersCollection = new PlayersCollection(this.player);
 
         this.game.set({
@@ -42,13 +43,49 @@ define(['jquery',
           players: playersCollection
         });
 
-        console.log(this.game);
-
+        // ideally, we'll store custom settings in localStorage
+        // so that users don't need to keep entering things like
+        // their display name, etc.
         localStorage.setItem('playerSettings', JSON.stringify(this.playerSettings));
         localStorage.setItem('game', JSON.stringify(this.game));
 
+        // foward user to the GameView (router will pick up this request)
         window.location = 'game.html#/id/' + this.game.id;
-        console.log('forwarding ' + this.game.get('name') + ' to ' + window.location);
+    },
+
+    joinById: function() {
+      var dispName = $("#displayNameJoin").val();
+      if(dispName === null || dispName === "") {
+        $(".errors").text('Display Name must not be empty!');
+        $("#displayNameJoin").focus();
+        return;
+      }
+      // parse game ID
+      var gameId = $('#gameID').val();
+      if(gameId === null || gameId === "") {
+        $(".errors").text('Game ID must not be empty!');
+        $("#gameID").focus();
+        return;
+      }
+
+      this.playerSettings.set( { displayName: dispName });
+      this.player.set( { name: this.playerSettings.get('displayNameJoin') });
+      var playersCollection = new PlayersCollection(this.player);
+
+      this.game.set({
+        id : gameId,
+        name : 'Joined by: ' + this.player.get('name'),
+        players: playersCollection
+      });
+
+      // ideally, we'll store custom settings in localStorage
+      // so that users don't need to keep entering things like
+      // their display name, etc.
+      localStorage.setItem('playerSettings', JSON.stringify(this.playerSettings));
+      localStorage.setItem('game', JSON.stringify(this.game));
+
+      // foward user to the GameView (router will pick up this request)
+      window.location = 'game.html#/id/' + this.game.id;
     },
 
     joinGame: function() {
@@ -62,13 +99,30 @@ define(['jquery',
       this.$el.html(homeHTML);
       var localPlayer = JSON.parse(localStorage.getItem('playerSettings'));
       if(localPlayer) {
-        $("#displayName").val(localPlayer.displayName);
+        $("#displayNameCreate").val(localPlayer.displayName);
+        $("#displayNameJoin").val(localPlayer.displayName);
       }
+      $("#new-game-modal").on('shown', function() {
+        console.log('new game modal opened');
+        $('#displayNameCreate').focus();
+      });
+      $("#join-game-id-modal").on('shown', function() {
+        console.log('join game by id modal opened');
+        if(localPlayer)
+          $("#gameID").focus();
+        else
+          $("#displayNameJoin").focus();
+      });
       return this;
     },
 
     generateGameID: function() {
       var length = 5;
+      return this.randomString(length);
+    },
+
+    // utility function to return a randomized string
+    randomString: function(length) {
       var chars = '0123456789ABCDEFGHIJKLMNOPQRSTUVWXTZabcdefghiklmnopqrstuvwxyz'.split('');
 
       if (! length) {
