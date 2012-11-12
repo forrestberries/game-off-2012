@@ -5,6 +5,7 @@ var io = require('socket.io'),
     express = require('express'),
     app = express.createServer(),
     games = {},
+    gamesInProgress = 0,
     fakeGameArray = [];
 
 fillGamesWithTestData();
@@ -109,7 +110,8 @@ app.get( '/games/location/:location', function( req, res ) {
 		res.json( response );
 	},
 	calculateCallback = function( i, distance ) {
-		var gameObj = {};
+		var gameObj = {},
+				count = 0;
 
 		if( distance <= distanceThreshhold ) {
 			distance = Math.round( distance * 100 ) / 100; //round to 2 decimal places
@@ -123,32 +125,34 @@ app.get( '/games/location/:location', function( req, res ) {
 		}
 	};
 
-	for( i = 0; i < fakeGameArray.length; i++ ) {
-		/*
-		* for more info on this nonsense,
-		* see http://en.wikipedia.org/wiki/Haversine_formula
-		* Shamelessly stolen from SO
-		*/
-		( function( game, location, i, callback ) {
-			if (typeof(Number.prototype.toRad) === "undefined") {
-				Number.prototype.toRad = function() {
-					return this * Math.PI / 180;
-				};
-			}
-			var lat = parseFloat( location[0] ),
-					lon = parseFloat( location[1] ),
-					gameLat = parseFloat( game.location.lat ),
-					gameLon = parseFloat( game.location.lon ),
-					R = 6371, // Radius of the earth in km
-					dLat = ( Math.abs( gameLat - lat ) ).toRad(),
-					dLon = ( Math.abs( gameLon - lon ) ).toRad(),
-					a = Math.sin( dLat/2 ) * Math.sin( dLat/2 ) +
-							Math.cos( lat.toRad() ) * Math.cos( gameLat.toRad() ) *
-							Math.sin( dLon/2 ) * Math.sin( dLon/2 ),
-					c = 2 * Math.atan2( Math.sqrt( a ), Math.sqrt( 1-a ) );
-			var dist = R * c * 0.621371; // Distance in miles
-			callback( i, dist );
-		})( fakeGameArray[i], location, i, calculateCallback );
+	for( var key in games ) {
+		if( games.hasOwnProperty( key ) ) {
+			/*
+			* for more info on this nonsense,
+			* see http://en.wikipedia.org/wiki/Haversine_formula
+			* Shamelessly stolen from SO
+			*/
+			( function( game, location, i, callback ) {
+				if (typeof(Number.prototype.toRad) === "undefined") {
+					Number.prototype.toRad = function() {
+						return this * Math.PI / 180;
+					};
+				}
+				var lat = parseFloat( location[0] ),
+						lon = parseFloat( location[1] ),
+						gameLat = parseFloat( game.location.lat ),
+						gameLon = parseFloat( game.location.lon ),
+						R = 6371, // Radius of the earth in km
+						dLat = ( Math.abs( gameLat - lat ) ).toRad(),
+						dLon = ( Math.abs( gameLon - lon ) ).toRad(),
+						a = Math.sin( dLat/2 ) * Math.sin( dLat/2 ) +
+								Math.cos( lat.toRad() ) * Math.cos( gameLat.toRad() ) *
+								Math.sin( dLon/2 ) * Math.sin( dLon/2 ),
+						c = 2 * Math.atan2( Math.sqrt( a ), Math.sqrt( 1-a ) );
+				var dist = R * c * 0.621371; // Distance in miles
+				callback( i, dist );
+			})( fakeGameArray[i], location, i, calculateCallback );
+		}
 	}
 });
 
