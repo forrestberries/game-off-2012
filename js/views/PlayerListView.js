@@ -1,11 +1,13 @@
-define(['jquery', 'backbone'], function($, Backbone){
+define(['jquery', 'backbone', 'collections/PlayersCollection'], function($, Backbone, PlayersCollection){
   var View = Backbone.View.extend({
 
-    el: "section#main",
+    el: "section#players",
 
     initialize: function() {
-      // Setting the view's template property
-      this.template = _.template( $("#home-view").html() );
+      var self = this;
+      this.collection.on( 'add remove change set', function( data ) {
+        self.render();
+      });
     },
 
     events: {
@@ -13,8 +15,15 @@ define(['jquery', 'backbone'], function($, Backbone){
     },
 
     render: function() {
+      console.log( '%cPlayerListView.render()', 'color: red;' );
+      console.log( this.collection );
+      this.template = _.template( $("#players-list-view").html(),  {  players: this.collection } );
       this.$el.html(this.template);
       return this;
+    },
+
+    addPlayer: function( playerModel ) {
+      this.collection.add( playerModel );
     }
   });
 

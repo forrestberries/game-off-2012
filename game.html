@@ -39,20 +39,29 @@
     <header class="navbar nav navbar-inner">
         <h1>Cards Against Humanity</h1>
     </header>
+    <section id="players"></section>
     <section id="main" class="container">
     </section>
     <!-- Underscore Templates -->
     <script id='game-view' type='text/template'>
-    <div>Here is the GameView for game id: <%= id %></div>
-    <input type='text' id='display-name' />
-    <a id='game-update'>Game Update</a><br />
-    <table>
-      <% _.each(players.toJSON(), function(player, id) { %>
-        <tr class="props" data-id=<%= id %>>
-          <td data-prop="name">Name: <%= player.name %></td>
-          <td data-prop="socketid">Socket ID: <%= player.socketid %></td>
-        </tr>
-      <% }); %>
+      <h3>Here is the GameView for game id: <%= id %></h3>
+    </script>
+    <script id='players-list-view' type='text/template'>
+      <table class='table table-hover'>
+        <thead>
+          <tr>
+            <th>Name</th><th>Socket ID</th><th>Points</th>
+          </tr>
+        </thead>
+        <tbody>
+          <% _.each(players.toJSON(), function(player, id) { %>
+            <tr class="props" data-id=<%= id %>>
+              <td data-prop="name"><%= player.name %></td>
+              <td data-prop="socketid"><%= player.socketid %></td>
+              <td data-prop="awesomePoints"><%= player.awesomePoints %></td>
+            </tr>
+          <% }); %>
+        </tbody>
     </table>
     </script>
 
