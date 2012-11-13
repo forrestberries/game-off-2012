@@ -145,6 +145,7 @@ define([
             players: new PlayersCollection( player )
           }
         );
+        this.game.get( 'deck' ).loadCards();
       } else {
         //mock one up and join an already existing game
         //to have game obj filled out later via server syncFromLocalStorages
