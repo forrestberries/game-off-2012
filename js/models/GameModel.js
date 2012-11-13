@@ -1,55 +1,59 @@
 
 define(["jquery",
-    "backbone",
-    "models/LocationModel"], function($, Backbone, Location) {
+  "backbone",
+  "models/LocationModel",
+  "models/DeckModel"], function($, Backbone, Location, DeckModel ) {
 
-    var Game = Backbone.Model.extend({
+  var Game = Backbone.Model.extend({
 
-        // Model Constructor
-        initialize: function() {
+      // Model Constructor
+      initialize: function() {
 
-            this.set({ location: new Location() });
-            //this.location = new Location();
+        this.set({ location: new Location() });
+        this.set({ deck: new DeckModel() } );
+        //this.location = new Location();
 
-            //this.location.on('change', function() { console.log(this.location); });
-             /*this.deck = new Deck();
-
-
-             this.gameOptions = new GameOptions();
-
-             this.czar = new Player();*/
-        },
+        //this.location.on('change', function() { console.log(this.location); });
+         /*this.deck = new Deck();
 
 
+         this.gameOptions = new GameOptions();
 
-        // Default values for all of the Game Model attributes
-        defaults: {
+         this.czar = new Player();*/
+      },
 
-            players: [],
+      nextRound: function() {
+          this.set({ currentRound: this.get( 'currentRound' ) + 1 });
+      },
 
-            id: "",
+      // Default values for all of the Game Model attributes
+      defaults: {
 
-            currentRound: 0,
+        players: [],
 
-            awesomePoints: 0,
+        id: "",
 
-            name: "",
+        currentRound: 0,
 
-            location: {}
+        awesomePoints: 0,
 
-            // deck
+        name: "",
 
-            // location
+        location: {}
 
-            // gameOptions
+        // deck
 
-            // czar (Player)
+        // location
 
-        }
+        // gameOptions
 
-    });
+        // czar (Player)
 
-    // Returns the Model class
-    return Game;
+    }
+
+  });
+
+  // Returns the Model class
+  return Game;
 
 });

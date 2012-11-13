@@ -1,4 +1,4 @@
-define(["jquery", "backbone"], function($, Backbone) {
+define(["jquery", "backbone", "models/CardModel"], function($, Backbone, Card) {
 
     var BlackCard = Card.extend({
 
