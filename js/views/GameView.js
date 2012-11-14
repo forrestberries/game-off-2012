@@ -6,7 +6,9 @@ define([
   'models/PlayerModel', 
   'models/LocationModel', 
   'models/GameModel',
-  'views/PlayerListView'], function($, Backbone, Socket, PlayersCollection, PlayerModel, LocationModel, GameModel, PlayerListView){
+  'views/PlayerListView',
+  'collections/WhiteCardsCollection',
+  'collections/BlackCardsCollection'], function($, Backbone, Socket, PlayersCollection, PlayerModel, LocationModel, GameModel, PlayerListView, WhiteCardsCollection, BlackCardsCollection){
   var View = Backbone.View.extend({
 
     el: "section#main",
@@ -26,6 +28,10 @@ define([
     },
 
     events: {
+
+    },
+
+    updateGame: function( self ) {
 
     },
 
@@ -62,6 +68,13 @@ define([
       var newGame = new GameModel( data );
       self.playerListView = new PlayerListView( { collection: newPlayersCollection } );
       newGame.set( { players: newPlayersCollection } );
+      this.game.set(
+        { 
+          players: newPlayersCollection
+        }
+      );
+      this.game.get( 'deck' ).set({ whitecards: new WhiteCardsCollection( data.deck.whitecards ) });
+      this.game.get( 'deck' ).set({ blackcards: new BlackCardsCollection( data.deck.blackcards ) });
       
       self.game = newGame;
 
@@ -90,17 +103,20 @@ define([
         }
       });
 
-      this.emit( 'update server listing', self.game );
+      self.socket.emit( 'update server listing', self.game );
     },
 
     joinOrCreateGame: function() {
       console.info( 'GameView.joinOrCreateGame()' );
       var self = this;
 
+      console.log( 'self.game' );
+      console.log( self.game );
       self.socket.emit( 'join game', self.game, function( data ) {
         //so this is only called if you're the first person
         //to join a game
         console.group( 'client updating game (response from server)', 'join game' );
+        console.log( data );
         self.updateRoom( data, self );
         self.player = new PlayerModel( data.players[0] );
       });
@@ -123,7 +139,8 @@ define([
       console.log( 'GameView.syncFromLocalStorage()' );
       var gameFromLocalStorageJson = JSON.parse( localStorage.getItem( 'game' ) );
           playerSettingsJson = JSON.parse( localStorage.getItem( 'playerSettings' ) ),
-          name = ''; //can get player name from PlayerSettings
+          name = '', //can get player name from PlayerSettings
+          self = this;
 
       if( playerSettingsJson ) {
         //lulz just for debuggins 
@@ -135,6 +152,7 @@ define([
       var player = new PlayerModel( { name: name } );
       if( gameFromLocalStorageJson ) {
         //found a good game object in local storage 
+        localStorage.removeItem( 'game' );
         var location = gameFromLocalStorageJson.location,
             players = gameFromLocalStorageJson.players;
 

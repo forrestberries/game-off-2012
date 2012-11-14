@@ -22,6 +22,10 @@ define(["jquery",
          this.czar = new Player();*/
       },
 
+      createGameFromData: function( data ) {
+        
+      },
+
       nextRound: function() {
           this.set({ currentRound: this.get( 'currentRound' ) + 1 });
       },

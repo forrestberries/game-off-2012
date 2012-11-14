@@ -33,12 +33,16 @@ define(["jquery",
       var self = this;
 
       self.whitecards = new WhiteCardsCollection();
-      $.getJSON( 'data/white-cards.json', function( response ){
-         for( var i = 0; i < response.cards.length; i++ ) {
+      $.ajax({
+        async: false,
+        dataType: "json",
+        url: "data/white-cards.json",
+        success: function( response ){
+          for( var i = 0; i < response.cards.length; i++ ) {
             var whiteCard = new WhiteCardModel( { text: response.cards[i] } );
             self.whitecards.add( whiteCard );
          }
-         self.trigger( 'white cards loaded' );
+        }
       });
     },
 
@@ -46,12 +50,16 @@ define(["jquery",
       var self = this;
 
       self.blackcards = new BlackCardsCollection();
-      $.getJSON( 'data/black-cards.json', function( response ){
-         for( var i = 0; i < response.cards.length; i++ ) {
+      $.ajax({
+        async: false,
+        dataType: "json",
+        url: "data/black-cards.json",
+        success: function( response ){
+          for( var i = 0; i < response.cards.length; i++ ) {
             var blackCard = new BlackCardModel( { text: response.cards[i] } );
             self.blackcards.add( blackCard );
          }
-         self.trigger( 'black cards loaded' );
+        }
       });
     },
 
