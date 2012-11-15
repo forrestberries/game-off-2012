@@ -61,7 +61,7 @@ define(['jquery',
       var playersCollection = new PlayersCollection(this.player);
 
       // initialize Game object
-      this.game.set({
+      this.game = new Game({
         id : gameId,
         name : this.player.get('name'),
         players: playersCollection
