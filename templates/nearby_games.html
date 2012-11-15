@@ -1,0 +1,17 @@
+<table class='table table-hover'>
+    <thead>
+      <tr>
+        <th>Name</th><th>Round</th><th>Players</th><th>Proximity</th>
+      </tr>
+    </thead>
+    <tbody>
+      <% _.each(games.toJSON(), function(game, id) { %>
+        <tr class="props" data-id=<%= id %>>
+          <td data-prop="name"><%= game.name %></td>
+          <td data-prop="round"><%= game.currentRound %></td>
+          <td data-prop="playerCount"><%= 1 %></td>
+          <td data-prop="proximity"><%= 'far away' %></td>
+        </tr>
+      <% }); %>
+    </tbody>
+</table>
