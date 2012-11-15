@@ -32,7 +32,6 @@ define(["jquery",
 
         self.get( 'deck' ).set({ "whitecards": wcc });
         self.get( 'deck' ).set({ "blackcards": bcc });
-        
       },
 
       gameCanBegin: function() {
@@ -89,7 +88,7 @@ define(["jquery",
 
         players: [],
 
-        id: "",
+        //id: "",
 
         currentRound: 1,
 

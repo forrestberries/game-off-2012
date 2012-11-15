@@ -14,18 +14,12 @@ define([
     // All of your Backbone Routes (add more)
     routes: {
       // When there is no hash bang on the url, the home method is called
-      "": "home",
-      "join-game-nearby": "nearbySearch"
+      "": "home"
     },
 
     home: function() {
       var homeView = new HomeView();
       homeView.render();
-    },
-
-    nearbySearch: function() {
-      var nearbyGamesView = new NearbyGamesView();
-      nearbyGamesView.render();
     }
   });
 

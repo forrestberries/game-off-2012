@@ -4,19 +4,19 @@ define(['jquery',
   'models/PlayerSettingsModel',
   'models/PlayerModel',
   'collections/PlayersCollection',
-  'text!templates/home.html'], function($, Backbone, Game, PlayerSettings, Player, PlayersCollection, homeHTML){
+  'collections/GamesCollection',
+  'views/NearbyGamesView',
+  'text!templates/home.html'], function($, Backbone, Game, PlayerSettings, Player, PlayersCollection, GamesCollection, NearbyGamesView, homeHTML){
   var View = Backbone.View.extend({
 
     el: "section#main",
 
     initialize: function() {
+        var self = this;
         var player = new Player();
         var playerSettings = new PlayerSettings();
-        var game = new Game();
-
         this.player = player;
         this.playerSettings = playerSettings;
-        this.game = game;
     },
 
     events: {
@@ -86,6 +86,7 @@ define(['jquery',
 
     render: function() {
       this.$el.html(homeHTML);
+      var self = this;
 
       // load in player name into the fields for the user
       var localPlayer = JSON.parse(localStorage.getItem('playerSettings'));
@@ -106,7 +107,23 @@ define(['jquery',
         else
           $("#displayNameJoin").focus();
       });
+      $("#join-game-nearby-modal").on('shown', function() {
+        if(localPlayer)
+          $("#displayNameJoinNearby").focus();
+        else
+          $("#displayNameJoinNearby").focus();
 
+        // poll for nearby games here
+
+        var game1 = new Game( { name: "Game 1", currentRound: 5 } );
+        var game2 = new Game( { name: "Game 2", currentRound: 14 } );
+        self.game = game1;
+        self.games = new GamesCollection ( game1 );
+        self.games.add(game2);
+
+        this.nearbyGamesView = new NearbyGamesView( { collection: self.games } );
+        this.nearbyGamesView.render();
+      });
       return this;
     },
 

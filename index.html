@@ -42,8 +42,28 @@
     <section id="main" class="container">
         Loading...
     </section>
-    
-    <div id="footer"></div>
+
+    <div id="footer"><a href="#settings" role="button" data-toggle="modal" class="btn btn-large">Settings</a></div>
+
+
+    <div class="modal hide fade" id="settings" tabindex="-1" role="dialog" aria-labelledby="settingsLabel" aria-hidden="true">
+      <div class="modal-header">
+          <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+          <h3 id="settingsLabel">User Settings</h3>
+      </div>
+      <div class="modal-body">
+        <form id="user-settings">
+          <label for="displayNameUser">Display Name</label>
+          <input type="text" id="displayNameUser" name="displayNameUser"><br />
+          <br />
+          <span class="errors" style="color:red;"></span>
+        </form>
+      </div>
+      <div class="modal-footer">
+          <button class="btn" id="closed" data-dismiss="modal" aria-hidden="true">Close</button>
+          <button class="btn btn-primary" id="save">Save Settings</button>
+      </div>
+    </div>
 
   <!-- Prompt IE 6 users to install Chrome Frame. Remove this if you support IE 6.
        chromium.org/developers/how-tos/chrome-frame-getting-started -->
