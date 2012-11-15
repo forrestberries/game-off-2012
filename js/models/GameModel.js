@@ -23,7 +23,7 @@ define(["jquery",
       },
 
       createGameFromData: function( data ) {
-        
+
       },
 
       nextRound: function() {
@@ -35,7 +35,7 @@ define(["jquery",
 
         players: [],
 
-        id: "",
+        //id: "",
 
         currentRound: 0,
 

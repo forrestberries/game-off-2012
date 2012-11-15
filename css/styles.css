@@ -1,7 +1,11 @@
 @import 'holo-base-elements.css';
+
 @import 'holo-base-widgets.css';
+
 @import 'holo-dark-elements.css';
+
 @import 'holo-dark-widgets.css';
+
 @import 'roboto.css';
 /*---------------------------------------------------
     LESS Elements 0.6
@@ -18,14 +22,14 @@
 body {
   padding: 0;
 }
+.modal {
+  color: #000;
+}
 .home-view {
   text-align: center;
 }
 .home-view button {
   width: 45%;
-}
-.home-view .modal {
-  color: black;
 }
 .container {
   max-width: 500px;

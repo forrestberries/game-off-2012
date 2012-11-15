@@ -1,10 +1,10 @@
 define([
-  'jquery', 
-  'backbone', 
-  'socket.io', 
-  'collections/PlayersCollection', 
-  'models/PlayerModel', 
-  'models/LocationModel', 
+  'jquery',
+  'backbone',
+  'socket.io',
+  'collections/PlayersCollection',
+  'models/PlayerModel',
+  'models/LocationModel',
   'models/GameModel',
   'views/PlayerListView',
   'collections/WhiteCardsCollection',
@@ -22,7 +22,7 @@ define([
 
       self.socket = socket;
       self.syncFromLocalStorage( id );
-      
+
       self.joinOrCreateGame();
 
     },
@@ -69,13 +69,13 @@ define([
       self.playerListView = new PlayerListView( { collection: newPlayersCollection } );
       newGame.set( { players: newPlayersCollection } );
       this.game.set(
-        { 
+        {
           players: newPlayersCollection
         }
       );
       this.game.get( 'deck' ).set({ whitecards: new WhiteCardsCollection( data.deck.whitecards ) });
       this.game.get( 'deck' ).set({ blackcards: new BlackCardsCollection( data.deck.blackcards ) });
-      
+
       self.game = newGame;
 
       console.log( '%c-----game-----', "color: blue;" );
@@ -132,7 +132,7 @@ define([
       this.socket.on( 'player left', function( badsocketid ) {
         self.playerLeft( badsocketid, self);
       });
-      
+
     },
 
     syncFromLocalStorage: function() {
@@ -143,22 +143,22 @@ define([
           self = this;
 
       if( playerSettingsJson ) {
-        //lulz just for debuggins 
+        //lulz just for debuggins
         name = playerSettingsJson.displayName + ( new Date().getMilliseconds() );
       } else {
-        //lulz just for debuggins 
+        //lulz just for debuggins
         name = 'bob' + ( new Date().getMilliseconds() );
       }
       var player = new PlayerModel( { name: name } );
       if( gameFromLocalStorageJson ) {
-        //found a good game object in local storage 
+        //found a good game object in local storage
         localStorage.removeItem( 'game' );
         var location = gameFromLocalStorageJson.location,
             players = gameFromLocalStorageJson.players;
 
         this.game = new GameModel( gameFromLocalStorageJson );
         this.game.set(
-          { 
+          {
             location: new LocationModel( location ),
             players: new PlayersCollection( player )
           }
@@ -170,7 +170,7 @@ define([
         //only ting that needs set is the id and player
         this.game = new GameModel( { id: this.id } );
         this.game.set(
-          { 
+          {
             players: new PlayersCollection( player )
           }
         );

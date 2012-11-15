@@ -12,7 +12,8 @@ require.config({
       "backbone": "libs/backbone",
       "backbone.validateAll": "plugins/Backbone.validateAll",
       "socket.io": "server/socket.io",
-      "canary-util": "plugins/canary-util"
+      "canary-util": "plugins/canary-util",
+      "templates": "../templates"
   },
 
   // Sets the configuration for your third party scripts that are not AMD compatible
