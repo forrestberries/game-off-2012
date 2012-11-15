@@ -4,7 +4,9 @@ define(["jquery", "backbone"], function($, Backbone) {
 
         // Model Constructor
         initialize: function() {
-             
+            this.bind("remove", function() {
+              this.destroy();
+            });
 
         },
 

@@ -9,7 +9,6 @@ define(["jquery",
 
     // Model Constructor
     initialize: function() {
-
     },
 
     drawWhiteCard: function() {
@@ -17,10 +16,6 @@ define(["jquery",
     },
 
     drawBlackCard: function() {
-
-    },
-
-    shuffle: function() {
 
     },
 
@@ -32,7 +27,7 @@ define(["jquery",
     loadWhiteCards: function() {
       var self = this;
 
-      self.whitecards = new WhiteCardsCollection();
+      self.set({ "whitecards": new WhiteCardsCollection() });
       $.ajax({
         async: false,
         dataType: "json",
@@ -40,7 +35,7 @@ define(["jquery",
         success: function( response ){
           for( var i = 0; i < response.cards.length; i++ ) {
             var whiteCard = new WhiteCardModel( { text: response.cards[i] } );
-            self.whitecards.add( whiteCard );
+            self.get( 'whitecards' ).add( whiteCard );
          }
         }
       });
@@ -49,7 +44,7 @@ define(["jquery",
     loadBlackCards: function() {
       var self = this;
 
-      self.blackcards = new BlackCardsCollection();
+      self.set({ "blackcards": new BlackCardsCollection() });
       $.ajax({
         async: false,
         dataType: "json",
@@ -57,7 +52,7 @@ define(["jquery",
         success: function( response ){
           for( var i = 0; i < response.cards.length; i++ ) {
             var blackCard = new BlackCardModel( { text: response.cards[i] } );
-            self.blackcards.add( blackCard );
+            self.get( 'blackcards' ).add( blackCard );
          }
         }
       });
@@ -65,9 +60,6 @@ define(["jquery",
 
     // Default values for all of the Deck Model attributes
     defaults: {
-
-      whitecards: [],
-      blackcards: []
 
     }
 

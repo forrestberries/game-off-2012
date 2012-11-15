@@ -18,6 +18,10 @@
 body {
   padding: 0;
 }
+.search .modal,
+#waiting-modal .modal {
+  color: black;
+}
 .home-view {
   text-align: center;
 }

@@ -7,8 +7,11 @@ define([
   'models/LocationModel', 
   'models/GameModel',
   'views/PlayerListView',
+  'views/PlayerCardView',
+  'views/GameWaitingView',
   'collections/WhiteCardsCollection',
-  'collections/BlackCardsCollection'], function($, Backbone, Socket, PlayersCollection, PlayerModel, LocationModel, GameModel, PlayerListView, WhiteCardsCollection, BlackCardsCollection){
+  'collections/BlackCardsCollection',
+  'models/DeckModel'], function($, Backbone, Socket, PlayersCollection, PlayerModel, LocationModel, GameModel, PlayerListView, PlayerCardView, GameWaitingView, WhiteCardsCollection, BlackCardsCollection, DeckModel){
   var View = Backbone.View.extend({
 
     el: "section#main",
@@ -16,11 +19,12 @@ define([
     initialize: function( id ) {
       console.info( 'GameView initialize()' );
       var self = this,
-          socket = io.connect( 'http://meowstep.com:20080' );
+          socket = io.connect( 'http://localhost:20080' );
 
       this.id = id;
 
       self.socket = socket;
+
       self.syncFromLocalStorage( id );
       
       self.joinOrCreateGame();
@@ -28,11 +32,20 @@ define([
     },
 
     events: {
-
+      'click #drawWhiteCard': function() {
+        this.drawWhiteCard( this );
+      }
     },
 
-    updateGame: function( self ) {
+    drawWhiteCard: function( self ) {
+      var card = self.game.drawWhiteCard();
+      self.player.get( 'whitecards' ).add( card );
+      self.socket.emit( 'update room', self.game );
+    },
 
+    updateCards: function( card, self ) {
+      self.game.get( 'whitecards' ).get( card )
+      self.game.updateCards( data.deck.whitecards, data.deck.blackcards );
     },
 
     render: function() {
@@ -40,41 +53,24 @@ define([
       this.template = _.template( $("#game-view").html(), { id: this.id } );
       this.playerListView.render();
       this.$el.html(this.template);
+      self.gameWaitinView = new GameWaitingView().render();
       return this;
-    },
-
-    newPlayer: function( player, self ) {
-      console.group( '%cNew Player', 'color: green;' );
-      var newPlayer = new PlayerModel( player );
-      if( !self.player ) {
-        console.log( 'it was you.' );
-        self.player = newPlayer;
-      }
-      self.playerListView.addPlayer( newPlayer );
-      self.game.get( "players" ).add( newPlayer );
-      console.log( "%c-----players-----", "color: blue;" );
-      console.log( self.game.get( 'players' ) );
-      console.groupEnd();
-
-      this.emit( 'update room', self.game );
     },
 
     updateRoom: function( data, self ) {
       console.group( 'client updating game' );
-      console.log( self );
-
       var newPlayersCollection = self.updateGamePlayers( data, self );
 
       var newGame = new GameModel( data );
       self.playerListView = new PlayerListView( { collection: newPlayersCollection } );
+
       newGame.set( { players: newPlayersCollection } );
       this.game.set(
         { 
           players: newPlayersCollection
         }
       );
-      this.game.get( 'deck' ).set({ whitecards: new WhiteCardsCollection( data.deck.whitecards ) });
-      this.game.get( 'deck' ).set({ blackcards: new BlackCardsCollection( data.deck.blackcards ) });
+      newGame.updateCards( data.deck.whitecards, data.deck.blackcards );
       
       self.game = newGame;
 
@@ -95,30 +91,15 @@ define([
       return newPlayersCollection;
     },
 
-    playerLeft: function( badsocketid, self ) {
-      console.log( badsocketid + ' left the game' );
-      self.game.get( 'players' ).each( function( model ) {
-        if( model.get( 'socketid' ) === badsocketid ) {
-          model.destroy();
-        }
-      });
-
-      self.socket.emit( 'update server listing', self.game );
-    },
-
     joinOrCreateGame: function() {
       console.info( 'GameView.joinOrCreateGame()' );
       var self = this;
 
-      console.log( 'self.game' );
-      console.log( self.game );
       self.socket.emit( 'join game', self.game, function( data ) {
         //so this is only called if you're the first person
         //to join a game
         console.group( 'client updating game (response from server)', 'join game' );
-        console.log( data );
         self.updateRoom( data, self );
-        self.player = new PlayerModel( data.players[0] );
       });
 
       self.socket.on( 'update room', function( data ) {
@@ -126,11 +107,11 @@ define([
       });
 
       self.socket.on( 'new player', function( player ) {
-        self.newPlayer( player, self );
+        self.game.newPlayer( player, self );
       });
 
       this.socket.on( 'player left', function( badsocketid ) {
-        self.playerLeft( badsocketid, self);
+        self.game.playerLeft( badsocketid, self );
       });
       
     },
@@ -168,6 +149,7 @@ define([
         //mock one up and join an already existing game
         //to have game obj filled out later via server syncFromLocalStorages
         //only ting that needs set is the id and player
+        this.player = player;
         this.game = new GameModel( { id: this.id } );
         this.game.set(
           { 
@@ -175,6 +157,8 @@ define([
           }
         );
       }
+      self.player = player;
+      self.playerCardView = new PlayerCardView( { collection: self.player.get( 'whitecards' ) } );
       this.playerListView = new PlayerListView( { collection: this.game.get( 'players' ) } );
       console.log( this.game );
     }
