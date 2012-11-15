@@ -39,12 +39,34 @@
     <header class="navbar nav navbar-inner">
         <h1>Cards Against Humanity</h1>
     </header>
+    <div id='waiting-modal'></div>
     <section id="players"></section>
     <section id="main" class="container">
     </section>
+    <section id="cards"></section>
     <!-- Underscore Templates -->
+    <script id='waiting' type='text/template'>
+      <div id='waiting-msg' class="modal hide fade">
+        <div class="modal-header">
+          <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+          <h3>Waiting...</h3>
+        </div>
+        <div class="modal-body">
+          <p>The game will start when at least 3 players have joined.</p>
+        </div>
+      </div>
+    </script>
     <script id='game-view' type='text/template'>
       <h3>Here is the GameView for game id: <%= id %></h3>
+      <button class="btn btn-primary" id="drawWhiteCard">Draw Card</button>
+    </script>
+    <script id="players-card-view" type="text/template">
+      <h5>Player Cards</h5>
+      <ul>
+        <% _.each(cards.toJSON(), function(card) { %>
+          <li><%= card.text %></li>    
+        <% }); %>
+      </ul>
     </script>
     <script id='players-list-view' type='text/template'>
       <table class='table table-hover'>

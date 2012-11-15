@@ -1,45 +1,49 @@
-define(["jquery",
-    "backbone"], function($, Backbone) {
+define([
+  "jquery",
+  "backbone",
+  "collections/BlackCardsCollection",
+  "collections/WhiteCardsCollection"], function($, Backbone, BlackCardsCollection, WhiteCardsCollection) {
 
-    var Player = Backbone.Model.extend({
+  var Player = Backbone.Model.extend({
 
-        // Model Constructor
-        initialize: function() {
+    // Model Constructor
+    initialize: function() {
 
-             //this.playerSettings = new PlayerSettings();
+       //this.playerSettings = new PlayerSettings();
+      this.set({ 'blackcards': new BlackCardsCollection() });
+      this.set({ 'whitecards': new WhiteCardsCollection() });
+    },
 
-        },
+    // Default values for all of the Player Model attributes
+    defaults: {
 
-        // Default values for all of the Player Model attributes
-        defaults: {
+      name: "",
 
-            name: "",
+      socketid: "",
 
-            socketid: "",
+      isCzar: false,
 
-            isCzar: false,
+      isGambling: false,
 
-            isGambling: false,
+      isWinner: false,
 
-            isWinner: false,
+      hasPlayed: false,
 
-            hasPlayed: false,
+      awesomePoints: 0,
 
-            awesomePoints: 0,
+      whitecards: [],
 
-            whiteCards: [],
+      blackcards: [],
 
-            blackCards: [],
+      cardsInPlay: []
 
-            cardsInPlay: []
+      // playerSettings
 
-            // playerSettings
+    }
 
-        }
+  });
 
-    });
-
-    // Returns the Model class
-    return Player;
+  // Returns the Model class
+  return Player;
 
 });

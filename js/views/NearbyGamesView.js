@@ -1,21 +1,30 @@
 define(['jquery',
   'backbone',
-  'text!templates/nearby_games.html'], function($, Backbone, modalHTML){
+  'collections/GamesCollection',
+  'models/GameModel',
+  'text!templates/nearby_games.html'], function($, Backbone, GamesCollection, Game, nearbyGamesHTML){
   var View = Backbone.View.extend({
 
-    el: "section#main",
+    el: $("#nearby-games"),
 
     initialize: function() {
       console.log('initializing Nearby Games Search view');
+      var self = this;
     },
 
     events: {
     },
 
     render: function() {
-      this.$el.html(modalHTML);
-      $("#nearby-games-modal").modal('show');
+      console.log( '%cNearbyGamesView.render()', 'color: red;' );
+      console.log( this.collection );
+      var compiledTemplate = _.template( nearbyGamesHTML, { games: this.collection });
+      $("#nearby-games").html(compiledTemplate);
       return this;
+    },
+
+    addGame: function ( game ) {
+      this.collection.add( game );
     }
   });
 
