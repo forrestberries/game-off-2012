@@ -5,13 +5,15 @@ define([
   "collections/WhiteCardsCollection"], function($, Backbone, BlackCardsCollection, WhiteCardsCollection) {
 
   var Player = Backbone.Model.extend({
-
+    idAttribute: "socketid",
     // Model Constructor
     initialize: function() {
-
-       //this.playerSettings = new PlayerSettings();
       this.set({ 'blackcards': new BlackCardsCollection() });
       this.set({ 'whitecards': new WhiteCardsCollection() });
+    },
+
+    addWhiteCard: function( card ) {
+      this.get( 'whitecards' ).add( card );
     },
 
     // Default values for all of the Player Model attributes

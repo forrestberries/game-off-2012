@@ -29,18 +29,25 @@ define([
 
       self.joinOrCreateGame();
 
+      self.gameWaitingView = new GameWaitingView().render();
     },
 
     events: {
       'click #drawWhiteCard': function() {
         this.drawWhiteCard( this );
+      },
+      'click #beginRound': function() {
+
       }
     },
 
     drawWhiteCard: function( self ) {
-      var card = self.game.drawWhiteCard();
-      self.player.get( 'whitecards' ).add( card );
-      self.socket.emit( 'update room', self.game );
+      self.game.drawWhiteCard( function( card ) {
+        var players = self.game.get( 'players' );
+        self.player.addWhiteCard( card );
+        players.get( self.player.id ).set({ 'whitecards' : self.player.get( 'whitecards' ) });
+        self.socket.emit( 'update room', self.game );
+      });
     },
 
     updateCards: function( card, self ) {
@@ -53,13 +60,13 @@ define([
       this.template = _.template( $("#game-view").html(), { id: this.id } );
       this.playerListView.render();
       this.$el.html(this.template);
-      self.gameWaitinView = new GameWaitingView().render();
       return this;
     },
 
     updateRoom: function( data, self ) {
       console.group( 'client updating game' );
-      var newPlayersCollection = self.updateGamePlayers( data, self );
+      var newPlayersCollection = self.updateGamePlayers( data, self ),
+          alreadyHidden = ( self.gameWaitingView.$el.find( '#waiting-msg' ).css( 'display' ) == 'none' );
 
       var newGame = new GameModel( data );
       self.playerListView = new PlayerListView( { collection: newPlayersCollection } );
@@ -70,6 +77,10 @@ define([
           players: newPlayersCollection
         }
       );
+
+      if( self.game.gameCanBegin() && !alreadyHidden) {
+        self.gameWaitingView.hideModal();
+      }
       
       newGame.updateCards( data.deck.whitecards, data.deck.blackcards );
       self.game = newGame;
@@ -85,7 +96,17 @@ define([
           newPlayersCollection = new PlayersCollection();
 
       for( var i = 0; i < newPlayers.length; i++ ) {
-        newPlayersCollection.add( new PlayerModel( newPlayers[i] ) );
+      var whites = new WhiteCardsCollection(),
+          blacks = new BlackCardsCollection(),
+          p = new PlayerModel( newPlayers[i] );
+          
+        whites.add( newPlayers[i].whitecards );
+        blacks.add( newPlayers[i].blackcards );
+        p.set({ 'whitecards': whites, 'blackcards': blacks });
+        newPlayersCollection.add( p );
+      }
+      if( !self.player.socketid ) {
+        self.player.set({ 'socketid': newPlayers[newPlayers.length - 1].socketid });
       }
 
       return newPlayersCollection;
@@ -160,7 +181,6 @@ define([
       self.player = player;
       self.playerCardView = new PlayerCardView( { collection: self.player.get( 'whitecards' ) } );
       this.playerListView = new PlayerListView( { collection: this.game.get( 'players' ) } );
-      console.log( this.game );
     }
   });
 

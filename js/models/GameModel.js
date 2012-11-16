@@ -25,6 +25,14 @@ define(["jquery",
          this.czar = new Player();*/
       },
 
+      chooseCzar: function( self ) {
+        var players = this.get( 'players' ),
+            czarPosition = this.getRandomInt( 0, players.length ),
+            czar = players.at( czarPosition );
+        czar.set({ 'isCzar': true });
+        self.socket.emit( 'czar chosen', self.game );
+      },
+
       updateCards: function( whitecards, blackcards ) {
         var self = this,
             wcc = new WhiteCardsCollection( whitecards ),
@@ -46,9 +54,7 @@ define(["jquery",
         }
         self.playerListView.addPlayer( newPlayer );
         self.game.get( "players" ).add( newPlayer );
-        if( this.gameCanBegin() ) {
-          self.gameWaitingView.hideModal();
-        }
+        
         console.log( "%c-----players-----", "color: blue;" );
         console.log( self.game.get( 'players' ) );
         console.groupEnd();
@@ -67,16 +73,17 @@ define(["jquery",
         self.socket.emit( 'update server listing', self.game );
       },
 
-      drawWhiteCard: function() {
+      drawWhiteCard: function( callback ) {
         var whitecards = this.get( 'deck' ).get( 'whitecards' );
         var cardPosition = this.getRandomInt( 0, whitecards.length );
         var card = whitecards.at( cardPosition );
         whitecards.remove( card );
-        return card;
+        callback( card );
       },
 
-      nextRound: function() {
+      nextRound: function( self ) {
           this.set({ currentRound: this.get( 'currentRound' ) + 1 });
+          this.chooseCzar( self );
       },
 
       getRandomInt: function( min, max ) {
