@@ -11,13 +11,20 @@ define(['jquery', 'backbone', 'collections/WhiteCardsCollection'], function($, B
     },
 
     events: {
-
+      'click .player-whitecard': 'playWhiteCard'
+    },
+    playWhiteCard: function( event ) {
+      var socketid = $( event.target.outerHTML ).data( 'id' );
+      window.CAH.game.playWhiteCard( socketid );
     },
 
     render: function() {
-      console.log( '%cPlayerCardView.render()', 'color: red;' );
-      console.log( this.collection );
+      console.log( '%cPlayerCardView.render()', 'color: blue;' );
+      _.each(this.collection.toJSON(), function(card) {
+        console.log( card );
+      });
       this.template = _.template( $("#players-card-view").html(),  {  cards: this.collection } );
+      console.log( this.template);
       this.$el.html(this.template);
       return this;
     },

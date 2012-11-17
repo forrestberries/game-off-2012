@@ -64,7 +64,7 @@
       <h5>Player Cards</h5>
       <ul>
         <% _.each(cards.toJSON(), function(card) { %>
-          <li><%= card.text %></li>    
+          <li class="player-whitecard" data-id=<%= card.socketid %>><%= card.text %></li>    
         <% }); %>
       </ul>
     </script>

@@ -22,6 +22,7 @@ define([
           socket = io.connect( 'http://localhost:20080' );
 
       this.id = id;
+      window.CAH = {};
 
       self.socket = socket;
 
@@ -43,9 +44,11 @@ define([
 
     drawWhiteCard: function( self ) {
       self.game.drawWhiteCard( function( card ) {
-        var players = self.game.get( 'players' );
+        var players = self.game.get( 'players' ),
+            playerOwner = players.get( self.player.id );
+        card.set({ 'socketid': playerOwner.id });
         self.player.addWhiteCard( card );
-        players.get( self.player.id ).set({ 'whitecards' : self.player.get( 'whitecards' ) });
+        playerOwner.set({ 'whitecards' : self.player.get( 'whitecards' ) });
         self.socket.emit( 'update room', self.game );
       });
     },
@@ -84,6 +87,8 @@ define([
       
       newGame.updateCards( data.deck.whitecards, data.deck.blackcards );
       self.game = newGame;
+
+      window.CAH.game = self.game;
 
       console.log( '%c-----game-----', "color: blue;" );
       console.log( self.game );

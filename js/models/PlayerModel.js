@@ -16,6 +16,10 @@ define([
       this.get( 'whitecards' ).add( card );
     },
 
+    playWhiteCard: function( card ) {
+
+    },
+
     // Default values for all of the Player Model attributes
     defaults: {
 

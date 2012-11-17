@@ -25,6 +25,10 @@ define(["jquery",
          this.czar = new Player();*/
       },
 
+      playWhiteCard: function( socketid ) {
+        
+      },
+
       chooseCzar: function( self ) {
         var players = this.get( 'players' ),
             czarPosition = this.getRandomInt( 0, players.length ),
