@@ -17,11 +17,13 @@ define(['jquery',
         var playerSettings = new PlayerSettings();
         this.player = player;
         this.playerSettings = playerSettings;
+        this.nearbyGame = '';
     },
 
     events: {
       "click #create": "createGame",
-      "click #joinId": "joinById"
+      "click #joinId": "joinById",
+      "click #joinNearby": "joinNearbyGame"
     },
 
     // creates a new game
@@ -33,6 +35,22 @@ define(['jquery',
           return;
         }
         return this.startGame(dispName, this.generateGameID());
+    },
+
+    joinNearbyGame: function() {
+      var self = this;
+      var dispName = $("#displayNameJoinNearby").val();
+      if(dispName === null || dispName === "") {
+        $(".errors").text('Display Name must not be empty!');
+        $("#displayNameJoinNearby").focus();
+        return;
+      }
+      console.log('dispName: ' + dispName + ', gameId: ' + self.nearbyGame);
+      if(self.nearbyGame === null || self.nearbyGame === '') {
+        $(".errors").text('You must have a game selected to join!');
+        return;
+      }
+      self.startGame(dispName, self.nearbyGame);
     },
 
     // joinById acts like createGame but uses a set ID rather than an auto generated
@@ -77,13 +95,6 @@ define(['jquery',
       window.location = 'game.html#/id/' + this.game.id;
     },
 
-    joinGame: function() {
-       // nearby, use URL: http://meowstep.com:20080/games/location/56,91
-       var URL = 'http://meowstep.com:20080/games/location/56,91';
-       $.getJSON(URL,function(data) { console.log(data); });
-       // populate collection of games in modal
-    },
-
     render: function() {
       this.$el.html(homeHTML);
       var self = this;
@@ -93,12 +104,18 @@ define(['jquery',
       if(localPlayer) {
         $("#displayNameCreate").val(localPlayer.displayName);
         $("#displayNameJoin").val(localPlayer.displayName);
+        $("#displayNameUser").val(localPlayer.displayName);
+        $("#displayNameJoinNearby").val(localPlayer.displayName);
       }
 
       // clear errors on new modal, set proper focus location
       $("#new-game-modal").on('shown', function() {
         $('.errors').empty();
         $('#displayNameCreate').focus();
+      });
+      $("#settings").on('shown', function() {
+        $('.errors').empty();
+        $('#displayNameUser').focus();
       });
       $("#join-game-id-modal").on('shown', function() {
         $('.errors').empty();
@@ -116,6 +133,11 @@ define(['jquery',
         // logic to poll for nearby games in the NearbyGamesView init
         this.nearbyGamesView = new NearbyGamesView();
         this.nearbyGamesView.render();
+
+        this.nearbyGamesView.on('gameChosen', function(gameId) {
+          console.log('selected game ' + gameId);
+          self.nearbyGame = gameId;
+        });
       });
       return this;
     },

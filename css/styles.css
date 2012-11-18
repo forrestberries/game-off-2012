@@ -1,7 +1,11 @@
 @import 'holo-base-elements.css';
+
 @import 'holo-base-widgets.css';
+
 @import 'holo-dark-elements.css';
+
 @import 'holo-dark-widgets.css';
+
 @import 'roboto.css';
 /*---------------------------------------------------
     LESS Elements 0.6
@@ -18,9 +22,16 @@
 body {
   padding: 0;
 }
+.settings {
+  color: #000;
+}
 .search .modal,
 #waiting-modal .modal {
-  color: black;
+  color: #000;
+}
+#nearby-games .selected {
+  background-color: #006dcc;
+  color: white;
 }
 .home-view {
   text-align: center;
@@ -29,7 +40,7 @@ body {
   width: 45%;
 }
 .home-view .modal {
-  color: black;
+  color: #000;
 }
 .container {
   max-width: 500px;

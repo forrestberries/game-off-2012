@@ -113,20 +113,18 @@ app.get( '/games/location/:location', function( req, res ) {
 	},
 	calculateCallback = function( i, distance, validGame ) {
 		var gameObj = {};
-
 		if( distance <= distanceThreshhold ) {
 			distance = Math.round( distance * 100 ) / 100; //round to 2 decimal places
-			gameObj.miles = distance;
-			gameObj.feet = Math.round( ( distance * 5280 ) * 100 ) / 100; //round to 2 decimal places
-			gameObj.game = validGame;
-			respGames.push( gameObj );
+			validGame.miles = distance;
+			validGame.feet = Math.round( ( distance * 5280 ) * 100 ) / 100; //round to 2 decimal places
+			//gameObj.game = validGame;
+			respGames.push( validGame );
 		}
 		if( i === gamesInProgress ) {
 			responseFinished();
 		}
 	},
 	count = 0;
-
 	for( var key in games ) {
 		if( games.hasOwnProperty( key ) ) {
 			/*
@@ -156,6 +154,8 @@ app.get( '/games/location/:location', function( req, res ) {
 			})( games[key], location, ++count, calculateCallback );
 		}
 	}
+	if(count === 0) // no games available nearby
+		responseFinished();
 });
 
 app.get( '/games', function( req, res ) {

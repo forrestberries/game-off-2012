@@ -6,6 +6,7 @@ define(["jquery", "backbone"], function($, Backbone) {
         initialize: function() {
              this.setLatLong();
              var self = this;
+             var locationFound = false;
         },
 
         // Default values for all of the Location Model attributes
@@ -24,10 +25,13 @@ define(["jquery", "backbone"], function($, Backbone) {
                     console.log('found location coords');
                     self.set( { latitude: position.coords.latitude });
                     self.set( { longitude: position.coords.longitude });
+                    locationFound = true;
+                    self.trigger("locationFound", { locationFound : true });
                 },function() {
                     console.error('failed to find location');
                     self.set( { latitude: '45' });
                     self.set( { longitude: '-91' });
+                    self.trigger("locationFound", { locationFound : false });
                 },
                 {timeout:5000});
         }

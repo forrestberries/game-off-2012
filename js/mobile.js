@@ -38,7 +38,10 @@ require.config({
 
 // Include Mobile Specific JavaScript files here (or inside of your Mobile router)
 require(['modernizr','jquery','backbone','routers/homeRouter', 'routers/gameRouter','bootstrap','backbone.validateAll', 'plugins/canary-util'], function(Modernizr, $, Backbone, HomeRouter, GameRouter) {
-
+  if (! window.CAH ) {
+    window.CAH = {};
+  }
+  window.CAH.serverhost = 'localhost:20080';
   // Instantiates a new Router
   if( document.URL.indexOf( 'game.html' ) > -1 ) {
     console.log( 'starting GameRouter' );
