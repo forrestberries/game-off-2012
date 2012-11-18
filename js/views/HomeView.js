@@ -113,15 +113,8 @@ define(['jquery',
         else
           $("#displayNameJoinNearby").focus();
 
-        // poll for nearby games here
-
-        var game1 = new Game( { name: "Game 1", currentRound: 5 } );
-        var game2 = new Game( { name: "Game 2", currentRound: 14 } );
-        self.game = game1;
-        self.games = new GamesCollection ( game1 );
-        self.games.add(game2);
-
-        this.nearbyGamesView = new NearbyGamesView( { collection: self.games } );
+        // logic to poll for nearby games in the NearbyGamesView init
+        this.nearbyGamesView = new NearbyGamesView();
         this.nearbyGamesView.render();
       });
       return this;

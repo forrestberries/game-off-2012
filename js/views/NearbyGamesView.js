@@ -10,6 +10,14 @@ define(['jquery',
     initialize: function() {
       console.log('initializing Nearby Games Search view');
       var self = this;
+      self.collection = new GamesCollection();
+      var URL = 'http://localhost:20080/games/location/41.25,-96';
+      $.getJSON( URL, function(data) { 
+        if(data) {
+          self.collection = JSON.parse(data).games; 
+          console.log('payload received: ' + JSON.stringify(data));
+        }
+      });
     },
 
     events: {

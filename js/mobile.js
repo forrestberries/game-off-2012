@@ -40,11 +40,11 @@ require.config({
 require(['modernizr','jquery','backbone','routers/homeRouter', 'routers/gameRouter','bootstrap','backbone.validateAll', 'plugins/canary-util'], function(Modernizr, $, Backbone, HomeRouter, GameRouter) {
 
   // Instantiates a new Router
-  if( document.URL.indexOf( 'index.html' ) > -1 ) {
-    console.log( 'starting homeRouter' );
-    this.router = new HomeRouter();
-  } else {
+  if( document.URL.indexOf( 'game.html' ) > -1 ) {
     console.log( 'starting GameRouter' );
     this.router = new GameRouter();
+  } else {
+    console.log( 'starting homeRouter' );
+    this.router = new HomeRouter();
   }
 });
