@@ -6,11 +6,11 @@
     </thead>
     <tbody>
       <% _.each(games.toJSON(), function(game, id) { %>
-        <tr class="props" data-id=<%= id %>>
-          <td data-prop="name"><%= game.name %></td>
+        <tr class="props joinableGame" data-id=<%= game.id %>>
+          <td data-prop="name"><%= game.id %></td>
           <td data-prop="round"><%= game.currentRound %></td>
-          <td data-prop="playerCount"><%= 1 %></td>
-          <td data-prop="proximity"><%= 'far away' %></td>
+          <td data-prop="playerCount"><%= game.players.length %></td>
+          <td data-prop="proximity"><%= game.miles + ' mi' %></td>
         </tr>
       <% }); %>
     </tbody>

@@ -8,7 +8,7 @@ define(["jquery",
   "collections/BlackCardsCollection"], function($, Backbone, Location, DeckModel, PlayerModel, WhiteCardsCollection, BlackCardsCollection ) {
 
   var Game = Backbone.Model.extend({
-
+      idAttribute: "id",
       // Model Constructor
       initialize: function() {
 
@@ -85,7 +85,7 @@ define(["jquery",
         }
         self.playerListView.addPlayer( newPlayer );
         self.game.get( "players" ).add( newPlayer );
-        
+
         console.log( "%c-----players-----", "color: blue;" );
         console.log( self.game.get( 'players' ) );
         console.groupEnd();
