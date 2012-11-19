@@ -25,15 +25,42 @@ define(["jquery",
          this.czar = new Player();*/
       },
 
-      playWhiteCard: function( socketid ) {
+      playWhiteCard: function( player, socketid, cardText ) {
+        var cardsArr, 
+            target = -1;
+
+        cardsArr = this.get( 'players' ).get( socketid ).get( 'whitecards' );
+        console.log( cardsArr );
+        for( var i = 0; i < cardsArr.length; i++ ) {
+          var currentText = cardsArr.models[i].get( 'text' );
+          if( ( currentText.indexOf( cardText ) > -1 ) && ( currentText.length == cardText.length ) ) {
+            target = i;
+            break;
+          }
+        }
+        console.log( cardsArr, target);
+        var targetCard = cardsArr.models[target];
+        targetCard.set({ 'playPosition': this.get( 'players' ).get( socketid ).get( 'cardsInPlay' ).length + 1 });
+
+        this.get( 'players' ).get( socketid ).removeWhiteCard( targetCard );
+        this.get( 'players' ).get( socketid ).get( 'cardsInPlay' ).add( targetCard );
+        this.get( 'players' ).get( socketid ).set({ 'hasPlayed': true });
         
+        //update local player..
+        player.removeWhiteCard( targetCard );
+        player.get( 'cardsInPlay' ).add( targetCard );
+        player.set({ 'hasPlayed': true });
+
+        console.log( this.get( 'players' ) );
+        window.CAH.socket.emit( 'update room', this );
       },
 
       chooseCzar: function( self ) {
-        var players = this.get( 'players' ),
-            czarPosition = this.getRandomInt( 0, players.length ),
-            czar = players.at( czarPosition );
-        czar.set({ 'isCzar': true });
+        var czarPosition = this.getRandomInt( 0, self.game.get( 'players' ).length );
+        self.game.get( 'players' ).at( czarPosition ).set({ 'isCzar': true });
+        if( self.game.get( 'players' ).at( czarPosition ).id === self.player.id ) {
+          self.player.set({ 'isCzar': true });
+        }
         self.socket.emit( 'czar chosen', self.game );
       },
 

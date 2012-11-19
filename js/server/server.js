@@ -37,7 +37,11 @@ var sio = io.listen(app);
 
 sio.sockets.on( 'connection', function( socket ) {
 
-
+	socket.on( 'czar chosen', function( game ) {
+		console.log( 'czar chosen for room ' + game.id );
+		games[game.id] = game;
+		sio.sockets.in( game.id ).emit( 'update room', game );
+	});
 	socket.on( 'update room', function( game ) {
 		console.log( 'update room request received for ' + game.id );
 		games[game.id] = game;
