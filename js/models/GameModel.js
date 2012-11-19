@@ -25,11 +25,15 @@ define(["jquery",
          this.czar = new Player();*/
       },
 
+      beginRound: function( self ) {
+        self.game.chooseCzar( self );
+      },
+
       playWhiteCard: function( player, socketid, cardText ) {
         var cardsArr, 
             target = -1;
 
-        cardsArr = this.get( 'players' ).get( socketid ).get( 'whitecards' );
+        cardsArr = player.get( 'whitecards' );
         console.log( cardsArr );
         for( var i = 0; i < cardsArr.length; i++ ) {
           var currentText = cardsArr.models[i].get( 'text' );
@@ -41,26 +45,28 @@ define(["jquery",
         console.log( cardsArr, target);
         var targetCard = cardsArr.models[target];
         targetCard.set({ 'playPosition': this.get( 'players' ).get( socketid ).get( 'cardsInPlay' ).length + 1 });
-
-        this.get( 'players' ).get( socketid ).removeWhiteCard( targetCard );
-        this.get( 'players' ).get( socketid ).get( 'cardsInPlay' ).add( targetCard );
-        this.get( 'players' ).get( socketid ).set({ 'hasPlayed': true });
         
         //update local player..
         player.removeWhiteCard( targetCard );
         player.get( 'cardsInPlay' ).add( targetCard );
         player.set({ 'hasPlayed': true });
 
-        console.log( this.get( 'players' ) );
+        //now update game object
+        this.get( 'players' )
+          .get( socketid )
+          .set({ 
+            'whitecards': player.get( 'whitecards' ),
+            'cardsInPlay': player.get( 'cardsInPlay' ),
+            'hasPlayed': true });
+
+        console.log( self.player.toJSON() );
         window.CAH.socket.emit( 'update room', this );
       },
 
       chooseCzar: function( self ) {
-        var czarPosition = this.getRandomInt( 0, self.game.get( 'players' ).length );
+        var czarPosition = this.getRandomInt( 0, self.game.get( 'players' ).length - 1 );
+        console.log( 'The CZAR is : ', self.game.get( 'players' ).at( czarPosition ).get( 'name' ) );
         self.game.get( 'players' ).at( czarPosition ).set({ 'isCzar': true });
-        if( self.game.get( 'players' ).at( czarPosition ).id === self.player.id ) {
-          self.player.set({ 'isCzar': true });
-        }
         self.socket.emit( 'czar chosen', self.game );
       },
 
@@ -71,6 +77,16 @@ define(["jquery",
 
         self.get( 'deck' ).set({ "whitecards": wcc });
         self.get( 'deck' ).set({ "blackcards": bcc });
+      },
+
+      updateGameObjectFromData: function( self, data ) {
+        self.game.set({
+          'awesomePoints': data.awesomePoints,
+          'currentRound': data.currentRound,
+          'id': data.id,
+          'location': data.location,
+          'name': data.name
+        });
       },
 
       gameCanBegin: function() {
@@ -113,8 +129,9 @@ define(["jquery",
       },
 
       nextRound: function( self ) {
-          this.set({ currentRound: this.get( 'currentRound' ) + 1 });
-          this.chooseCzar( self );
+        this.set({ currentRound: this.get( 'currentRound' ) + 1 });
+        this.$el.find( '#drawWhiteCard' ).attr("disabled", "disabled");
+        this.beginRound( self );
       },
 
       getRandomInt: function( min, max ) {

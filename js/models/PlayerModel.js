@@ -10,10 +10,16 @@ define([
     initialize: function() {
       this.set({ 'blackcards': new BlackCardsCollection() });
       this.set({ 'whitecards': new WhiteCardsCollection() });
+      this.set({ 'cardsInPlay': new WhiteCardsCollection() });
+      
     },
 
     addWhiteCard: function( card ) {
       this.get( 'whitecards' ).add( card );
+    },
+
+    removeWhiteCard: function( card ) {
+      this.get( 'whitecards' ).remove( card );
     },
 
     playWhiteCard: function( card ) {

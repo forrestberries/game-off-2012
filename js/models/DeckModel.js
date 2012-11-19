@@ -37,6 +37,9 @@ define(["jquery",
             var whiteCard = new WhiteCardModel( { text: response.cards[i] } );
             self.get( 'whitecards' ).add( whiteCard );
          }
+        },
+        error: function( jqXHR, textStatus, errorThrown ) {
+          console.error( textStatus, errorThrown );
         }
       });
     },
@@ -54,6 +57,9 @@ define(["jquery",
             var blackCard = new BlackCardModel( { text: response.cards[i] } );
             self.get( 'blackcards' ).add( blackCard );
          }
+        },
+        error: function( jqXHR, textStatus, errorThrown ) {
+          console.error( textStatus, errorThrown );
         }
       });
     },
