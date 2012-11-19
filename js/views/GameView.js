@@ -9,9 +9,11 @@ define([
   'views/PlayerListView',
   'views/PlayerCardView',
   'views/GameWaitingView',
+  'views/CardsInPlayView',
+  'views/CzarView',
   'collections/WhiteCardsCollection',
   'collections/BlackCardsCollection',
-  'models/DeckModel'], function($, Backbone, Socket, PlayersCollection, PlayerModel, LocationModel, GameModel, PlayerListView, PlayerCardView, GameWaitingView, WhiteCardsCollection, BlackCardsCollection, DeckModel){
+  'models/DeckModel'], function($, Backbone, Socket, PlayersCollection, PlayerModel, LocationModel, GameModel, PlayerListView, PlayerCardView, GameWaitingView, CardsInPlayView, CzarView, WhiteCardsCollection, BlackCardsCollection, DeckModel){
   var View = Backbone.View.extend({
 
     el: "section#main",
@@ -22,7 +24,9 @@ define([
           socket = io.connect( 'http://localhost:20080' );
 
       this.id = id;
-      window.CAH = {};
+      if( !window.CAH ) {
+        window.CAH = {};
+      }
 
       self.socket = socket;
 
@@ -39,16 +43,21 @@ define([
       },
       'click #beginRound': function() {
 
+      },
+      'click #chooseCzar': function() {
+        this.game.chooseCzar( this );
       }
     },
 
     drawWhiteCard: function( self ) {
       self.game.drawWhiteCard( function( card ) {
-        var players = self.game.get( 'players' ),
-            playerOwner = players.get( self.player.id );
-        card.set({ 'socketid': playerOwner.id });
+        console.log( 'GameView.drawWhiteCard(): socketid of he who owns me: ' + self.player.id );
+        card.set({ 'socketid': self.player.id });
         self.player.addWhiteCard( card );
-        playerOwner.set({ 'whitecards' : self.player.get( 'whitecards' ) });
+        self.game.get( 'players' ).get( self.player.id ).set({ 'whitecards' : self.player.get( 'whitecards' ) });
+        console.log( 'PLAYERS AFTER drawWhiteCard' );
+        console.log( self.game.get( 'players' ) );
+        self.$el.find( '#drawWhiteCard' ).attr("disabled", "disabled");
         self.socket.emit( 'update room', self.game );
       });
     },
@@ -71,22 +80,16 @@ define([
       var newPlayersCollection = self.updateGamePlayers( data, self ),
           alreadyHidden = ( self.gameWaitingView.$el.find( '#waiting-msg' ).css( 'display' ) == 'none' );
 
-      var newGame = new GameModel( data );
+      self.game.updateGameObjectFromData( self, data );
       self.playerListView = new PlayerListView( { collection: newPlayersCollection } );
-
-      newGame.set( { players: newPlayersCollection } );
-      this.game.set(
-        {
-          players: newPlayersCollection
-        }
-      );
+      self.game.set({ players: newPlayersCollection });
 
       if( self.game.gameCanBegin() && !alreadyHidden) {
         self.gameWaitingView.hideModal();
+        //self.game.beginRound( self );
       }
       
-      newGame.updateCards( data.deck.whitecards, data.deck.blackcards );
-      self.game = newGame;
+      self.game.updateCards( data.deck.whitecards, data.deck.blackcards );
 
       window.CAH.game = self.game;
 
@@ -97,20 +100,36 @@ define([
     },
 
     updateGamePlayers: function( data, self ) {
+      console.log( 'GameView.updateGamePlayers()' );
       var newPlayers = data.players,
-          newPlayersCollection = new PlayersCollection();
-
+          newPlayersCollection = new PlayersCollection(),
+          allCardsInPlay = new WhiteCardsCollection();
+      console.log( data );
       for( var i = 0; i < newPlayers.length; i++ ) {
-      var whites = new WhiteCardsCollection(),
-          blacks = new BlackCardsCollection(),
-          p = new PlayerModel( newPlayers[i] );
+        var whites = new WhiteCardsCollection(),
+            blacks = new BlackCardsCollection(),
+            inplay = new WhiteCardsCollection(),
+            p = new PlayerModel( newPlayers[i] );
           
         whites.add( newPlayers[i].whitecards );
         blacks.add( newPlayers[i].blackcards );
-        p.set({ 'whitecards': whites, 'blackcards': blacks });
+        inplay.add( newPlayers[i].cardsInPlay );
+        allCardsInPlay.add( newPlayers[i].cardsInPlay );
+
+        p.set({ 'whitecards': whites, 'blackcards': blacks, 'cardsInPlay': inplay });
+        if( p.id === self.player.id && ( p.get( 'isCzar' ) ) ) {
+          self.player.set({ 'isCzar': true });
+        }
         newPlayersCollection.add( p );
       }
-      if( !self.player.socketid ) {
+      if( self.player.get( 'isCzar' ) ) {
+        self.czarView = new CzarView({ collection: allCardsInPlay }).render();
+        self.$el.find( '#drawWhiteCard' ).addClass( 'hidden' );
+      } else {
+        self.$el.find( '#drawWhiteCard' ).removeClass( 'hidden' );
+      }
+
+      if( !self.player.get( 'socketid' ) ) {
         self.player.set({ 'socketid': newPlayers[newPlayers.length - 1].socketid });
       }
 
@@ -184,8 +203,12 @@ define([
         );
       }
       self.player = player;
-      self.playerCardView = new PlayerCardView( { collection: self.player.get( 'whitecards' ) } );
+      console.log( 'self.player' );
+      console.log( self.player );
+      self.cardsInPlayView = new CardsInPlayView({ collection: self.player.get( 'cardsInPlay' )});
+      self.playerCardView = new PlayerCardView( { collection: self.player.get( 'whitecards' ), game: self.game, player: self.player } );
       this.playerListView = new PlayerListView( { collection: this.game.get( 'players' ) } );
+      window.CAH.socket = self.socket;
     }
   });
 
