@@ -44,6 +44,8 @@
     <section id="main" class="container">
     </section>
     <section id="cards"></section>
+    <section id="cardsInPlay"></section>
+    <section id="czarCardsInPlay"></section>
     <!-- Underscore Templates -->
     <script id='waiting' type='text/template'>
       <div id='waiting-msg' class="modal hide fade">
@@ -59,9 +61,26 @@
     <script id='game-view' type='text/template'>
       <h3>Here is the GameView for game id: <%= id %></h3>
       <button class="btn btn-primary" id="drawWhiteCard">Draw Card</button>
+      <button class="btn btn-primary" id="chooseCzar">Choose Czar</button>
     </script>
     <script id="players-card-view" type="text/template">
       <h5>Player Cards</h5>
+      <ul>
+        <% _.each(cards.toJSON(), function(card) { %>
+          <li class="player-whitecard" data-id=<%= card.socketid %>><%= card.text %></li>    
+        <% }); %>
+      </ul>
+    </script>
+    <script id="czar-view" type="text/template">
+      <h5>Cards to choose from</h5>
+      <ul>
+        <% _.each(cards.toJSON(), function(card) { %>
+          <li class="player-whitecard" data-id=<%= card.socketid %>><%= card.text %></li>    
+        <% }); %>
+      </ul>
+    </script>
+    <script id="cards-in-play-view" type="text/template">
+      <h5>Cards In Play</h5>
       <ul>
         <% _.each(cards.toJSON(), function(card) { %>
           <li class="player-whitecard" data-id=<%= card.socketid %>><%= card.text %></li>    
