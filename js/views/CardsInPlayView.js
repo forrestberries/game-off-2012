@@ -1,4 +1,4 @@
-define(['jquery', 'backbone', 'collections/WhiteCardsCollection'], function($, Backbone, WhiteCardsCollection){
+define(['jquery', 'backbone', 'collections/WhiteCardsCollection', 'collections/BlackCardsCollection'], function($, Backbone, WhiteCardsCollection, BlackCardsCollection){
   var View = Backbone.View.extend({
 
     el: "section#cardsInPlay",

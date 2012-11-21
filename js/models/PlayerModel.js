@@ -12,6 +12,7 @@ define([
       this.set({ 'whitecards': new WhiteCardsCollection() });
       this.set({ 'cardsInPlay': new WhiteCardsCollection() });
       
+      
     },
 
     addWhiteCard: function( card ) {
@@ -41,6 +42,10 @@ define([
 
       hasPlayed: false,
 
+      hasDrawnWhiteCards: false,
+
+      hasDrawnBlackCard: false,
+
       awesomePoints: 0,
 
       whitecards: [],
@@ -48,7 +53,7 @@ define([
       blackcards: [],
 
       cardsInPlay: []
-
+      
       // playerSettings
 
     }
