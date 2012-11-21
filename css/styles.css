@@ -1,7 +1,11 @@
 @import 'holo-base-elements.css';
+
 @import 'holo-base-widgets.css';
+
 @import 'holo-dark-elements.css';
+
 @import 'holo-dark-widgets.css';
+
 @import 'roboto.css';
 /*---------------------------------------------------
     LESS Elements 0.6
@@ -16,17 +20,18 @@
     More info at: http://lesselements.com
 -----------------------------------------------------*/
 body {
+  font-family: 'Helvetica', 'Arial', 'Sans serif';
   padding: 0;
 }
 .hidden {
   display: none;
 }
 .settings {
-  color: black;
+  color: #000;
 }
 .search .modal,
 #waiting-modal .modal {
-  color: black;
+  color: #000;
 }
 #nearby-games .selected {
   background-color: #006dcc;
@@ -39,7 +44,7 @@ body {
   width: 45%;
 }
 .home-view .modal {
-  color: black;
+  color: #000;
 }
 .container {
   max-width: 500px;
@@ -54,6 +59,42 @@ body {
   -moz-background-clip: padding;
   -webkit-background-clip: padding-box;
   background-clip: padding-box;
+}
+.player-whitecard {
+  background-color: #FFF;
+  width: 150px;
+  height: 200px;
+  margin-right: 10px;
+  margin-bottom: 10px;
+  float: left;
+  padding: 15px;
+  -webkit-border-radius: 5px;
+  -moz-border-radius: 5px;
+  border-radius: 5px;
+  -moz-background-clip: padding;
+  -webkit-background-clip: padding-box;
+  background-clip: padding-box;
+}
+.blackcard {
+  background-color: #000;
+  width: 150px;
+  height: 200px;
+  margin-right: 10px;
+  margin-bottom: 10px;
+  float: left;
+  padding: 15px;
+  -webkit-border-radius: 5px;
+  -moz-border-radius: 5px;
+  border-radius: 5px;
+  -moz-background-clip: padding;
+  -webkit-background-clip: padding-box;
+  background-clip: padding-box;
+}
+.whitecard-text {
+  color: #000;
+}
+.blackcard-text {
+  color: #FFF;
 }
 @media screen and (max-width: 373px) {
   h1 {

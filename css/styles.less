@@ -6,6 +6,7 @@
 @import 'elements.less';
 
 body {
+  font-family:'Helvetica', 'Arial', 'Sans serif';
   padding: 0;
 }
 .hidden {
@@ -43,7 +44,32 @@ body {
   margin: 20px 10px 20px 10px;
   .rounded( 5px );
 }
-
+.player-whitecard {
+  background-color: #FFF;
+  width:150px;
+  height:200px;
+  margin-right:10px;
+  margin-bottom:10px;
+  float:left;
+  padding: 15px;
+  .rounded( 5px );
+}
+.blackcard {
+  background-color: #000;
+  width:150px;
+  height:200px;
+  margin-right:10px;
+  margin-bottom:10px;
+  float:left;
+  padding: 15px;
+  .rounded( 5px );
+}
+.whitecard-text {
+  color:#000;
+}
+.blackcard-text {
+  color:#FFF;
+}
 @media screen and (max-width: 373px) {
   h1 {
     font-size: 25px;

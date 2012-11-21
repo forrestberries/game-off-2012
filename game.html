@@ -64,35 +64,35 @@
     </script>
     <script id="players-card-view" type="text/template">
       <h5>Player Cards</h5>
-      <ul>
+      <div>
         <% _.each(cards.toJSON(), function(card) { %>
-          <li class="player-whitecard" data-id=<%= card.socketid %>><%= card.text %></li>    
+          <div class="player-whitecard" data-id=<%= card.socketid %>><span class='whitecard-text'><%= card.text %></span></div>
         <% }); %>
-      </ul>
+      </div>
     </script>
     <script id="czar-view" type="text/template">
       <h5>Cards to choose from</h5>
-      <ul>
+      <div id='playerWhiteCards'>
         <% _.each(cards.toJSON(), function(card) { %>
-          <li class="player-whitecard" data-id=<%= card.socketid %>><%= card.text %></li>    
+          <div class="player-whitecard" data-id=<%= card.socketid %>><span class='whitecard-text'><%= card.text %></span></div>
         <% }); %>
-      </ul>
+      </div>
     </script>
     <script id="black-card-in-play-view" type="text/template">
       <h5>blackcard In Play</h5>
       <ul>
         <% _.each(cards.toJSON(), function(card) { %>
-          <li class="blackcard inplay" data-id=<%= card.socketid %>><%= card.text %></li>    
+          <li class="blackcard inplay" data-id=<%= card.socketid %>><span class='blackcard-text'><%= card.text %></span></li>
         <% }); %>
       </ul>
     </script>
     <script id="cards-in-play-view" type="text/template">
       <h5>Cards In Play</h5>
-      <ul>
+      <div id='gameWhiteCards'>
         <% _.each(cards.toJSON(), function(card) { %>
-          <li class="player-whitecard" data-id=<%= card.socketid %>><%= card.text %></li>    
+          <div class="player-whitecard" data-id=<%= card.socketid %>><span class='whitecard-text'><%= card.text %></span></div>
         <% }); %>
-      </ul>
+      </div>
     </script>
     <script id='players-list-view' type='text/template'>
       <table class='table table-hover'>
