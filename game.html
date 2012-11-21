@@ -66,7 +66,7 @@
       <h5>Player Cards</h5>
       <div>
         <% _.each(cards.toJSON(), function(card) { %>
-          <div class="player-whitecard" data-id=<%= card.socketid %>><span class='whitecard-text'><%= card.text %></span></div>
+          <div class="player-whitecard" data-id=<%= card.socketid %>><%= card.text %></div>
         <% }); %>
       </div>
     </script>
@@ -74,7 +74,7 @@
       <h5>Cards to choose from</h5>
       <div id='playerWhiteCards'>
         <% _.each(cards.toJSON(), function(card) { %>
-          <div class="player-whitecard" data-id=<%= card.socketid %>><span class='whitecard-text'><%= card.text %></span></div>
+          <div class="player-whitecard" data-id=<%= card.socketid %>><%= card.text %></div>
         <% }); %>
       </div>
     </script>
@@ -82,7 +82,7 @@
       <h5>blackcard In Play</h5>
       <ul>
         <% _.each(cards.toJSON(), function(card) { %>
-          <li class="blackcard inplay" data-id=<%= card.socketid %>><span class='blackcard-text'><%= card.text %></span></li>
+          <li class="blackcard inplay" data-id=<%= card.socketid %>><%= card.text %></li>
         <% }); %>
       </ul>
     </script>
@@ -90,7 +90,7 @@
       <h5>Cards In Play</h5>
       <div id='gameWhiteCards'>
         <% _.each(cards.toJSON(), function(card) { %>
-          <div class="player-whitecard" data-id=<%= card.socketid %>><span class='whitecard-text'><%= card.text %></span></div>
+          <div class="player-whitecard" data-id=<%= card.socketid %>><%= card.text %></div>
         <% }); %>
       </div>
     </script>
