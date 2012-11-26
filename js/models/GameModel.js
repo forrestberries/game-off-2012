@@ -1,10 +1,3 @@
-
-/*
-Need to go through and refine the choose czar logic and when the udpating happens to continue the rest of the round.
-After that, need to set hasPlayed to true after playing awhite card then disable additional playes.
-*/
-
-
 define(["jquery",
   "backbone",
   "models/LocationModel",
@@ -44,65 +37,36 @@ define(["jquery",
         }
       },
 
-      playWhiteCard: function( player, socketid, cardText ) {
-        var cardsArr, 
-            target = -1;
-
-        cardsArr = player.get( 'whitecards' );
-        console.log( cardsArr );
-        for( var i = 0; i < cardsArr.length; i++ ) {
-          var currentText = cardsArr.models[i].get( 'text' );
-          if( ( currentText.indexOf( cardText ) > -1 ) && ( currentText.length == cardText.length ) ) {
-            target = i;
-            break;
-          }
-        }
-        console.log( cardsArr, target);
-        var targetCard = cardsArr.models[target];
-        targetCard.set({ 
-          'playPosition': this.get( 'players' ).get( socketid ).get( 'cardsInPlay' ).length + 1,
-          'inPlay': true 
-        });
-        
-        //update local player..
-        player.removeWhiteCard( targetCard );
-        player.get( 'cardsInPlay' ).add( targetCard );
-        player.set({ 'hasPlayed': true });
-
-        //now update game object
-        this.get( 'players' )
-          .get( socketid )
-          .set({ 
-            'whitecards': player.get( 'whitecards' ),
-            'cardsInPlay': player.get( 'cardsInPlay' ),
-            'hasPlayed': true 
-          });
-
-        console.log( self.player.toJSON() );
-        window.CAH.socket.emit( 'update room', this );
-      },
-
       chooseCzar: function( self, callback ) {
-        var czarPosition = this.getRandomInt( 0, self.game.get( 'players' ).length - 1 );
+        var czarPosition = 0;//this.getRandomInt( 0, self.game.get( 'players' ).length - 1 );
         console.log( 'The CZAR is : ', self.game.get( 'players' ).at( czarPosition ).get( 'name' ) );
         self.game.get( 'players' ).at( czarPosition ).set({ 'isCzar': true });
         self.socket.emit( 'czar chosen', self.game );
         callback();
       },
 
-      updateCards: function( whitecards, blackcards, blackCardsInPlay ) {
-        var self = this,
-            wcc = new WhiteCardsCollection( whitecards ),
-            bcc = new BlackCardsCollection( blackcards ),
-            bcip = new BlackCardsCollection( blackCardsInPlay );
-
-        self.get( 'deck' ).set({ 
+      updateCards: function( data, self ) {
+        var wcc = new WhiteCardsCollection( data.deck.whitecards ),
+            bcc = new BlackCardsCollection( data.deck.blackcards ),
+            bcip = new BlackCardsCollection( data.deck.blackCardsInPlay );
+        console.log( 'updating cards.... ', wcc, bcc, bcip );
+        this.get( 'deck' ).set({
           "whitecards": wcc,
           "blackcards": bcc
         });
-        self.set({
-          "blackCardsInPlay": bcip
-        });
+        if( self.player.get( 'gameHost' ) && !self.player.get( 'hasDrawnBlackCard' ) ) {
+          self.player.set({ 'hasDrawnBlackCard': true });
+          self.game.drawBlackCard( self, function() {
+            console.log( self.game.get( 'blackCardsInPlay' ) );
+            self.game.set({ 'blackCardsInPlay': self.game.get( 'blackCardsInPlay' ) });
+            console.log( self.game.get( 'blackCardsInPlay' ).models );
+            self.socket.emit( 'blackcard chosen', self.game, self.game.get( 'blackCardsInPlay' ).models );
+          });
+        } else {
+          self.game.set({
+            "blackCardsInPlay": bcip
+          });
+        }
       },
 
       updateGameObjectFromData: function( self, data ) {
@@ -127,7 +91,7 @@ define(["jquery",
               blacks = new BlackCardsCollection(),
               inplay = new WhiteCardsCollection(),
               p = new PlayerModel( newPlayers[i] );
-            
+
           whites.add( newPlayers[i].whitecards );
           blacks.add( newPlayers[i].blackcards );
           inplay.add( newPlayers[i].cardsInPlay );
@@ -143,7 +107,7 @@ define(["jquery",
         if( !self.player.get( 'socketid' ) ) {
           self.player.set({ 'socketid': newPlayers[newPlayers.length - 1].socketid });
         }
-        self.game.set({ 
+        self.game.set({
           'players': newPlayersCollection,
           'allCardsInPlay': allCardsInPlay
         });
@@ -151,7 +115,6 @@ define(["jquery",
       },
 
       gameCanBegin: function() {
-        console.log('Can the game  begin?', this.get( 'players').length );
         return ( this.get( 'players' ).length > 2 );
       },
 
@@ -189,19 +152,15 @@ define(["jquery",
       },
 
       drawBlackCard: function( self, callback ) {
-        var blackcards = this.get( 'deck' ).get( 'blackcards' ),
+        console.log( self );
+        var blackcards = self.game.get( 'deck' ).get( 'blackcards' ),
             cardPosition = this.getRandomInt( 0, blackcards.length ),
             card = blackcards.at( cardPosition );
-
+        console.log( 'taco', self.game.get( 'blackCardsInPlay' ) );
+        self.game.get( 'blackCardsInPlay' ).add( card );
+        console.log( 'taco', self.game.get( 'blackCardsInPlay' ) );
+        self.game.set({ 'blackCardsInPlay': self.game.get( 'blackCardsInPlay' ) });
         blackcards.remove( card );
-        card.set({ 'socketid': self.player.id });
-        self.game.putBlackCardInPlay( card, self, callback );
-
-      },
-
-      putBlackCardInPlay: function( card, self, callback ) {
-        this.get( 'blackCardsInPlay' ).add( card );
-        self.blackCardInPlayView.addCard( card );
         callback();
       },
 

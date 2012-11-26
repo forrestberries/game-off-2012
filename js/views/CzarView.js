@@ -5,7 +5,7 @@ define(['jquery', 'backbone', 'collections/WhiteCardsCollection'], function($, B
 
     initialize: function() {
       var self = this;
-      this.collection.on( 'add remove change set', function( data ) {
+      this.collection.on( 'add remove change reset', function( data ) {
         self.render();
       });
     },
@@ -15,10 +15,13 @@ define(['jquery', 'backbone', 'collections/WhiteCardsCollection'], function($, B
     render: function() {
       console.log( '%cCzarView.render()', 'color: blue;' );
       this.template = _.template( $("#czar-view").html(),  { cards: this.collection } );
-      console.log( this.template);
       this.$el.html(this.template);
       return this;
     },
+
+    updateCards: function( cards ) {
+      this.collection.reset( cards.models );
+    }
 
   });
 

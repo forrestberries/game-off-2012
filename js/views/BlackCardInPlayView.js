@@ -14,7 +14,7 @@ define(['jquery', 'backbone', 'collections/BlackCardsCollection'], function($, B
     },
 
     render: function() {
-      console.log( '%BlackCardInPlayView.render()', 'color: blue;' );
+      console.log( '%cBlackCardInPlayView.render()', 'color: blue;' );
       this.template = _.template( $("#black-card-in-play-view").html(),  {  cards: this.collection } );
       console.log( this.template);
       this.$el.html(this.template);
@@ -27,6 +27,10 @@ define(['jquery', 'backbone', 'collections/BlackCardsCollection'], function($, B
 
     removeCard: function( cardModel ) {
       this.collection.remove( cardModel );
+    },
+
+    updateCards: function( cards ) {
+      this.collection.reset( cards.models );
     }
   });
 

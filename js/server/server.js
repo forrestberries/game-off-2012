@@ -1,8 +1,8 @@
 /* this is the file thats on the server running socket.io.
 * putting it here for version control and because ST2
 * is a way better IDE than vim. */
-var io = require('socket.io'),
-    express = require('express'),
+var io = require('C:\\Users\\IGEN721\\NODE\\node_modules\\socket.io'),
+    express = require('C:\\Users\\IGEN721\\NODE\\node_modules\\express'),
     app = express.createServer(),
     games = {},
     gamesInProgress = 0,
@@ -50,13 +50,21 @@ sio.sockets.on( 'connection', function( socket ) {
 	socket.on( 'czar chosen', function( game ) {
 		console.log( 'czar chosen for room ' + game.id );
 		games[game.id] = game;
-		sio.sockets.in( game.id ).emit( 'update room', game );
+		sio.sockets.in( game.id ).emit( 'czar chosen', game );
 	});
+
+	socket.on( 'blackcard chosen', function( game, cards ) {
+		console.log( 'blackcard chosen for room ' + game.id );
+		game.blackCardsInPlay = cards;
+		games[game.id] = game;
+		sio.sockets.in( game.id ).emit( 'blackcard chosen', games[game.id] );
+	});
+
 	socket.on( 'update room', function( game ) {
 		console.log( 'update room request received for ' + game.id );
 		games[game.id] = game;
 		sio.sockets.in( game.id ).emit( 'update room', game );
-		
+
 /*		if( isOlderThan( 5, lastUpdate ) ) {
 			//go ahead and update since its older than 5 seconds
 			games[game.id].updates = {
@@ -208,7 +216,7 @@ app.post( '/games/id/:id/players', function( req, res ) {
 	var id = req.params.id,
 			theGame = games[id];
 
-	
+
 });
 
 app.get( '/games/id/:id', function( req, res ) {
