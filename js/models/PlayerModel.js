@@ -6,6 +6,7 @@ define([
 
   var Player = Backbone.Model.extend({
     idAttribute: "socketid",
+    
     // Model Constructor
     initialize: function() {
       this.set({ 'blackcards': new BlackCardsCollection() });

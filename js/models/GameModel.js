@@ -1,11 +1,18 @@
 
+/*
+Need to go through and refine the choose czar logic and when the udpating happens to continue the rest of the round.
+After that, need to set hasPlayed to true after playing awhite card then disable additional playes.
+*/
+
+
 define(["jquery",
   "backbone",
   "models/LocationModel",
   "models/DeckModel",
   "models/PlayerModel",
   "collections/WhiteCardsCollection",
-  "collections/BlackCardsCollection"], function($, Backbone, Location, DeckModel, PlayerModel, WhiteCardsCollection, BlackCardsCollection ) {
+  "collections/BlackCardsCollection",
+  "collections/PlayersCollection"], function($, Backbone, Location, DeckModel, PlayerModel, WhiteCardsCollection, BlackCardsCollection, PlayersCollection ) {
 
   var Game = Backbone.Model.extend({
       idAttribute: "id",
@@ -30,7 +37,6 @@ define(["jquery",
         if( self.game.get( 'czarSetForCurrentRound' ) ) {
 
         } else {
-          self.game.set({ 'czarSetForCurrentRound': true, 'inProgress': true });
           //goin' to do some synchronous stuff.. :*(
           this.chooseCzar( self, function(){
             //not needed for now...
@@ -110,7 +116,42 @@ define(["jquery",
         });
       },
 
+      updateGamePlayers: function( data, self ) {
+        console.log( 'GameView.updateGamePlayers()' );
+        var newPlayers = data.players,
+            newPlayersCollection = new PlayersCollection(),
+            allCardsInPlay = new WhiteCardsCollection();
+        console.log( data );
+        for( var i = 0; i < newPlayers.length; i++ ) {
+          var whites = new WhiteCardsCollection(),
+              blacks = new BlackCardsCollection(),
+              inplay = new WhiteCardsCollection(),
+              p = new PlayerModel( newPlayers[i] );
+            
+          whites.add( newPlayers[i].whitecards );
+          blacks.add( newPlayers[i].blackcards );
+          inplay.add( newPlayers[i].cardsInPlay );
+          allCardsInPlay.add( newPlayers[i].cardsInPlay );
+
+          p.set({ 'whitecards': whites, 'blackcards': blacks, 'cardsInPlay': inplay });
+          if( p.id == self.player.id && ( p.get( 'isCzar' ) ) ) {
+            self.player.set({ 'isCzar': true });
+          }
+          newPlayersCollection.add( p );
+        }
+
+        if( !self.player.get( 'socketid' ) ) {
+          self.player.set({ 'socketid': newPlayers[newPlayers.length - 1].socketid });
+        }
+        self.game.set({ 
+          'players': newPlayersCollection,
+          'allCardsInPlay': allCardsInPlay
+        });
+        return newPlayersCollection;
+      },
+
       gameCanBegin: function() {
+        console.log('Can the game  begin?', this.get( 'players').length );
         return ( this.get( 'players' ).length > 2 );
       },
 
@@ -130,23 +171,14 @@ define(["jquery",
         self.socket.emit( 'update room', self.game );
       },
 
-      playerLeft: function( badsocketid, self ) {
-        console.log( badsocketid + ' left the game' );
-        self.game.get( 'players' ).each( function( model ) {
-          if( model.get( 'socketid' ) === badsocketid ) {
-            model.destroy();
-          }
-        });
-
-        self.socket.emit( 'update server listing', self.game );
-      },
-
       drawWhiteCards: function( self ) {
         var numberOfCards = 10; //TODO get from Settings
         for( var i = 0; i < numberOfCards; i++ ) {
           var whitecards = this.get( 'deck' ).get( 'whitecards' ),
               cardPosition = this.getRandomInt( 0, whitecards.length ),
               card = whitecards.at( cardPosition );
+
+          console.log( 'getting card at cardPosition ' + cardPosition );
 
           whitecards.remove( card );
           card.set({ 'socketid': self.player.id });
@@ -156,7 +188,7 @@ define(["jquery",
         self.socket.emit( 'update room', self.game );
       },
 
-      drawBlackCard: function( self ) {
+      drawBlackCard: function( self, callback ) {
         var blackcards = this.get( 'deck' ).get( 'blackcards' ),
             cardPosition = this.getRandomInt( 0, blackcards.length ),
             card = blackcards.at( cardPosition );

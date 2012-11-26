@@ -44,12 +44,9 @@ define([
 
     drawWhiteCard: function( self ) {
       self.game.drawWhiteCard( function( card ) {
-        console.log( 'GameView.drawWhiteCard(): socketid of he who owns me: ' + self.player.id );
         card.set({ 'socketid': self.player.id });
         self.player.addWhiteCard( card );
         self.game.get( 'players' ).get( self.player.id ).set({ 'whitecards' : self.player.get( 'whitecards' ) });
-        console.log( 'PLAYERS AFTER drawWhiteCard' );
-        console.log( self.game.get( 'players' ) );
         $( '#drawWhiteCard' ).attr("disabled", "disabled");
         self.socket.emit( 'update room', self.game );
       });
@@ -61,100 +58,98 @@ define([
     },
 
     render: function() {
-      console.info( 'GameView.render()' );
+      console.log( 'GameView.render()' );
       this.template = _.template( $("#game-view").html(), { id: this.id } );
       this.playerListView.render();
       this.$el.html(this.template);
       return this;
     },
 
-    oncePerClientPerRound: function( self ) {
+    gameInProgress: function( self ) {
+      var alreadyHidden = ( $( '#waiting-msg' ).css( 'display' ) == 'none' );
 
-    },
-
-    updateRoom: function( data, self ) {
-      console.group( 'client updating game' );
-      var newPlayersCollection = self.updateGamePlayers( data, self ),
-          alreadyHidden = ( self.gameWaitingView.$el.find( '#waiting-msg' ).css( 'display' ) == 'none' );
-
-      self.game.updateGameObjectFromData( self, data );
-
-      //pry don't need to do a new,
-      //just a set??
-      self.playerListView = new PlayerListView( { collection: newPlayersCollection } );
-      self.game.set({ players: newPlayersCollection });
-      if( self.game.gameCanBegin() && !alreadyHidden) {
+      if( !alreadyHidden ) {
         self.gameWaitingView.hideModal();
       }
       //SOME BULLSHIT CONDITION CHECKS COMIN' UP BRO.
       //condition so the beginRound code is only executed by one client
       //Not sure how else to do this...
-      if( self.game.gameCanBegin() && !!self.player.get( 'gameHost' ) && !self.game.get( 'czarSetForCurrentRound' )) {
-        self.game.beginRound( self );
-      }
-      //condition for code that needs to happen
-      //ONCE per EACH client EXCEPT the czar
-      if( self.game.gameCanBegin() && !self.player.get( 'isCzar' )  && !self.player.get( 'hasDrawnWhiteCards' ) && self.game.get( 'czarSetForCurrentRound' ) ) {
-        self.player.set({ 'hasDrawnWhiteCards': true });
-        self.game.drawWhiteCards( self );
-      }
-      if( self.game.get( 'inProgress' ) ) { //game is in progress stuff that needs to happen
-      }
-      //ONLY EXEC ONCE for the player who IS the czar
-      //and has NOT drawn black card.
-      if( !!self.player.get( 'isCzar' ) && ( self.game.get( 'blackCardsInPlay' ).length === 0 ) ) {
-        /*self.game.drawBlackCard( self, function() {
-          self.socket.emit( 'update room', self.game );
-        });*/
-      }
-      
-      
-      self.game.updateCards( data.deck.whitecards, data.deck.blackcards, data.deck.blackcards );
-      window.CAH.game = self.game;
+      console.log( 'is this person the game host', !!self.player.get( 'gameHost' ));
+      if( !!self.player.get( 'gameHost' ) ) {
+        if( !self.player.get( 'czarSetForCurrentRound' ) )  {
+          self.game.set({ 'inProgress': true });
+          self.player.set({'czarSetForCurrentRound': true});
+          self.game.set({'czarSetForCurrentRound': true});
+          //choose the czar
+          self.game.chooseCzar( self, function() {
 
-      console.log( '%c-----game-----', "color: blue;" );
-      console.log( self.game );
-      console.groupEnd();
-      self.render();
-    },
-
-    renderBlackCardInPlayView: function( self ) {
-    },
-
-    updateGamePlayers: function( data, self ) {
-      console.log( 'GameView.updateGamePlayers()' );
-      var newPlayers = data.players,
-          newPlayersCollection = new PlayersCollection(),
-          allCardsInPlay = new WhiteCardsCollection();
-      console.log( data );
-      for( var i = 0; i < newPlayers.length; i++ ) {
-        var whites = new WhiteCardsCollection(),
-            blacks = new BlackCardsCollection(),
-            inplay = new WhiteCardsCollection(),
-            p = new PlayerModel( newPlayers[i] );
-          
-        whites.add( newPlayers[i].whitecards );
-        blacks.add( newPlayers[i].blackcards );
-        inplay.add( newPlayers[i].cardsInPlay );
-        allCardsInPlay.add( newPlayers[i].cardsInPlay );
-
-        p.set({ 'whitecards': whites, 'blackcards': blacks, 'cardsInPlay': inplay });
-        if( p.id == self.player.id && ( p.get( 'isCzar' ) ) ) {
-          self.player.set({ 'isCzar': true });
+          });
+        } else {
+          //wait for czar to be set
         }
-        newPlayersCollection.add( p );
+      } else { //this else means the czar has been chosen
       }
-      if( self.player.get( 'isCzar' ) ) {
-        console.log( "I AM THE CZAR. 8========D~~~~ on YOU" );
-        self.czarView = new CzarView({ collection: allCardsInPlay }).render();
+      if( self.game.get( 'czarSetForCurrentRound' ) ) {
+        if( self.player.get( 'isCzar' ) ) {
+          //TODO
+          //SINCE i'm newing up a CzarView everytime here
+          //I need to do some clean up so I don't leave zombie views
+          console.log( "I AM THE CZAR. 8========D~~~~ on YOU" );
+          self.czarView = new CzarView({ collection: self.game.get( 'allCardsInPlay' ) }).render();
+          console.log( 'black cards in play = ', self.game.get( 'blackCardsInPlay' ).length );
+          if( self.game.get( 'blackCardsInPlay' ).length < 1 ) { //czar view is not on the screen
+            self.game.drawBlackCard( self, function() {
+              self.socket.emit( 'update room', self.game );
+            });
+          }
+        } else { //player is NOT the czar
+          //draw some white cards once
+          if( self.player.get( 'whitecards' ).length < 1 ) {
+            self.game.drawWhiteCards( self );
+          }
+        }
+      }
+       /*{
+        self.game.beginRound( self );
       } else {
-      }
+        //condition for code that needs to happen
+        //ONCE per EACH client EXCEPT the czar
+        console.log( self.player.name, self.player.get( 'isCzar' ) );
 
-      if( !self.player.get( 'socketid' ) ) {
-        self.player.set({ 'socketid': newPlayers[newPlayers.length - 1].socketid });
-      }
+        if( !self.player.get( 'isCzar' )  && !self.player.get( 'hasDrawnWhiteCards' ) && self.game.get( 'czarSetForCurrentRound' ) ) {
+          self.player.set({ 'hasDrawnWhiteCards': true });
+          self.game.drawWhiteCards( self );
+        }
+        if( self.game.get( 'inProgress' ) ) { //game is in progress stuff that needs to happen
+        }
+        //ONLY EXEC ONCE for the player who IS the czar
+        //and has NOT drawn black card.
+        if( !!self.player.get( 'isCzar' ) && ( self.game.get( 'blackCardsInPlay' ).length === 0 ) ) {
+          /*self.game.drawBlackCard( self, function() {
+            self.socket.emit( 'update room', self.game );
+          });
+        }
+      }*/
+      
+    },
 
-      return newPlayersCollection;
+    updateRoom: function( data, self ) {
+      console.log( 'client updating game' );
+      console.log( data );
+
+      this.playerListView.update( data.players );
+
+      self.game.updateGamePlayers( data, self );
+      self.game.updateGameObjectFromData( self, data );
+
+
+      if( self.game.gameCanBegin() ) {
+        self.gameInProgress( self );
+      }
+      self.game.updateCards( data.deck.whitecards, data.deck.blackcards, data.deck.blackcardsInPlay );
+      
+      window.CAH.game = self.game;
+      self.render();
     },
 
     joinOrCreateGame: function() {
@@ -165,8 +160,11 @@ define([
         //so this is only called if you're the first person
         //to join a game
         self.player.set({ 'gameHost': true });
-        console.log( 'client updating game (response from server)', 'join game' );
         self.updateRoom( data, self );
+      });
+
+      self.socket.on( 'player update', function( players ) {
+
       });
 
       self.socket.on( 'update room', function( data ) {
@@ -178,11 +176,21 @@ define([
       });
 
       this.socket.on( 'player left', function( badsocketid ) {
-        self.game.playerLeft( badsocketid, self );
+        self.playerListView.playerLeft( badsocketid, self );
       });
 
     },
 
+    spawnChildViews: function() {
+      //this.cardsInPlayView = new CardsInPlayView({ collection: this.player.get( 'cardsInPlay' )});
+      this.playerCardView = new PlayerCardView( { collection: this.player.get( 'whitecards' ), game: this.game, player: this.player } );
+      this.blackCardInPlayView = new BlackCardInPlayView({ collection: this.game.get( 'blackCardsInPlay' )});
+      this.playerListView = new PlayerListView( { collection: this.game.get( 'players' ) } );
+      this.playerListView.socket = this.socket;
+      this.playerListView.collection.url = 'http://' + window.CAH.serverhost + '/games/id/' + this.id + '/players';
+      
+    },
+    
     syncFromLocalStorage: function() {
       console.log( 'GameView.syncFromLocalStorage()' );
       var gameFromLocalStorageJson = JSON.parse( localStorage.getItem( 'game' ) );
@@ -227,23 +235,11 @@ define([
         );
       }
       self.player = player;
-      console.log( 'self.player' );
-      console.log( self.player );
-      self.cardsInPlayView = new CardsInPlayView({ collection: self.player.get( 'cardsInPlay' )});
-      self.playerCardView = new PlayerCardView( { collection: self.player.get( 'whitecards' ), game: self.game, player: self.player } );
-      //self.blackCardInPlayView = new BlackCardInPlayView({ collection: self.game.get( 'blackCardsInPlay' )});
-      this.playerListView = new PlayerListView( { collection: this.game.get( 'players' ) } );
       window.CAH.socket = self.socket;
+      self.spawnChildViews();
     }
   });
 
   // Returns the View class
   return View;
 });
-
-
-
-
-
-
-

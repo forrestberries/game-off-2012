@@ -33,6 +33,16 @@ var sio = io.listen(app);
   setTimeout(arguments.callee,1500);
 })();
 
+function isOlderThan( limit, time ) {
+	var now = new Date(),
+			difference = (Math.abs(now - time) / 1000); //in seconds
+	console.log( ' the difference in seconds is ' + difference );
+	if( difference > limit ) {
+		return true;
+	}
+	return false;
+}
+
 /*SOCKETS :) */
 
 sio.sockets.on( 'connection', function( socket ) {
@@ -46,7 +56,20 @@ sio.sockets.on( 'connection', function( socket ) {
 		console.log( 'update room request received for ' + game.id );
 		games[game.id] = game;
 		sio.sockets.in( game.id ).emit( 'update room', game );
-	});
+		
+/*		if( isOlderThan( 5, lastUpdate ) ) {
+			//go ahead and update since its older than 5 seconds
+			games[game.id].updates = {
+				'update room': new Date()
+			};
+		} else {
+			//if the update is newer than 5 seconds, don't update
+			console.log( 'game is new enough, not updating' );
+			games[game.id].updates = {
+				'update room': lastUpdate
+			};
+		}
+*/	});
 
 	socket.on( 'update server listing', function( game ) {
 		games[game.id] = game;
@@ -60,7 +83,6 @@ sio.sockets.on( 'connection', function( socket ) {
 
 	socket.on( 'join game', function( game, callback ) {
 		console.log( '++++++++++++GAME+++++++++++' );
-		console.log( game );
 		//check if room exists
 		if( games[game.id] ) {
 			console.log( 'Room already exists' );
@@ -77,7 +99,9 @@ sio.sockets.on( 'connection', function( socket ) {
 			console.log( 'Rooms available (and its members): ' );
 			console.log( sio.sockets.manager.rooms );
 			callback( game );
-
+			game.updates = {
+				'update room': new Date()
+			};
 			games[game.id] = game;
 			gamesInProgress++;
 		}
@@ -172,6 +196,19 @@ app.get( '/games', function( req, res ) {
 	}
 
 	res.json( response );
+});
+app.get( '/games/id/:id/players', function( req, res ) {
+	var id = req.params.id,
+			theGame = games[id];
+
+	res.json( theGame.players );
+});
+
+app.post( '/games/id/:id/players', function( req, res ) {
+	var id = req.params.id,
+			theGame = games[id];
+
+	
 });
 
 app.get( '/games/id/:id', function( req, res ) {

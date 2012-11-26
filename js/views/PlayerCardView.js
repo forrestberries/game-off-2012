@@ -14,12 +14,14 @@ define(['jquery', 'backbone', 'collections/WhiteCardsCollection'], function($, B
       'click .player-whitecard': 'playWhiteCard'
     },
     playWhiteCard: function( event ) {
-      var card = $( event.target ),
-          self = this,
-          cardText = card.text(),
-          socketid = card.data( 'id' );
-      console.log( 'PlayerCardView.playWhiteCard(): socket of person who owns me ' + socketid );
-      self.options.game.playWhiteCard( self.options.player, socketid, cardText );
+      if( !this.options.player.get( 'hasPlayed' ) ) {
+        var card = $( event.target ),
+            self = this,
+            cardText = card.text(),
+            socketid = card.data( 'id' );
+        console.log( 'PlayerCardView.playWhiteCard(): socket of person who owns me ' + socketid );
+        self.options.game.playWhiteCard( self.options.player, socketid, cardText );
+      }
     },
 
     render: function() {

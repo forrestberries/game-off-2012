@@ -2,7 +2,11 @@ define(["jquery","backbone","models/PlayerModel"], function($, Backbone, Player)
 
     var Players = Backbone.Collection.extend({
 
-      model: Player
+      model: Player,
+
+      syncCollection: function( self ) {
+      	
+      }
 
     });
 
