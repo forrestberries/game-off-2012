@@ -5,7 +5,7 @@ define(['jquery', 'backbone', 'collections/BlackCardsCollection'], function($, B
 
     initialize: function() {
       var self = this;
-      this.collection.on( 'add remove change set', function( data ) {
+      this.collection.on( 'add remove change reset', function( data ) {
         self.render();
       });
     },

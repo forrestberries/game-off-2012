@@ -84,7 +84,7 @@ define([
         console.log( 'is this person the czar', !!self.player.get( 'isCzar' ));
         if( self.player.get( 'isCzar' ) ) {
           if( !self.czarView ) {
-            self.czarView = new CzarView({ collection: self.game.get( 'allCardsInPlay' ) }).render();
+            self.czarView = new CzarView({ collection: self.game.get( 'allCardsInPlay' ), game:self.game, player: self.player }).render();
           } else {
             console.log( 'cards in play', self.game.get( 'allCardsInPlay' ) ) ;
             self.czarView.updateCards( self.game.get( 'allCardsInPlay' ) );
@@ -98,7 +98,7 @@ define([
         }
       }
 
-      //self.blackCardInPlayView.updateCards( self.game.get)
+      self.blackCardInPlayView.updateCards( self.game.get( 'blackCardsInPlay' ) );
     },
 
     updateRoom: function( data, self ) {
@@ -166,7 +166,7 @@ define([
     spawnChildViews: function() {
       //this.cardsInPlayView = new CardsInPlayView({ collection: this.player.get( 'cardsInPlay' )});
       this.playerCardView = new PlayerCardView( { collection: this.player.get( 'whitecards' ), game: this.game, player: this.player } );
-      this.blackCardInPlayView = new BlackCardInPlayView({ collection: this.game.get( 'blackCardsInPlay' )});
+      this.blackCardInPlayView = new BlackCardInPlayView({ collection: this.game.get( 'blackCardsInPlay' ) });
       this.playerListView = new PlayerListView( { collection: this.game.get( 'players' ) } );
       this.playerListView.socket = this.socket;
       this.playerListView.collection.url = 'http://' + window.CAH.serverhost + '/games/id/' + this.id + '/players';

@@ -38,7 +38,7 @@ define(["jquery",
       },
 
       chooseCzar: function( self, callback ) {
-        var czarPosition = 0;//this.getRandomInt( 0, self.game.get( 'players' ).length - 1 );
+        var czarPosition = this.getRandomInt( 0, self.game.get( 'players' ).length - 1 );
         console.log( 'The CZAR is : ', self.game.get( 'players' ).at( czarPosition ).get( 'name' ) );
         self.game.get( 'players' ).at( czarPosition ).set({ 'isCzar': true });
         self.socket.emit( 'czar chosen', self.game );
@@ -48,8 +48,8 @@ define(["jquery",
       updateCards: function( data, self ) {
         var wcc = new WhiteCardsCollection( data.deck.whitecards ),
             bcc = new BlackCardsCollection( data.deck.blackcards ),
-            bcip = new BlackCardsCollection( data.deck.blackCardsInPlay );
-        console.log( 'updating cards.... ', wcc, bcc, bcip );
+            bcip = new BlackCardsCollection( data.blackCardsInPlay );
+        console.log( 'updating cards.... ', data, bcip );
         this.get( 'deck' ).set({
           "whitecards": wcc,
           "blackcards": bcc
@@ -189,7 +189,7 @@ define(["jquery",
 
         location: {},
 
-        blackCardsInPlay: []
+        //blackCardsInPlay: []
 
         // deck
 
