@@ -103,8 +103,8 @@
         </thead>
         <tbody>
           <% _.each(players.toJSON(), function(player, id) { %>
-            <tr class="props" data-id=<%= id %>>
-              <td data-prop="name"><%= player.name %></td>
+            <tr class="props" <% if( player.hasPlayed ) { print( 'class="hasPlayed"' ); } else if( player.isCzar ) { print( 'class="isCzar"' ); } %> data-id=<%= id %>>
+              <td data-prop="name" ><%= player.name %></td>
               <td data-prop="socketid"><%= player.socketid %></td>
               <td data-prop="awesomePoints"><%= player.awesomePoints %></td>
             </tr>
