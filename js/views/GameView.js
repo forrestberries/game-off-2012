@@ -55,9 +55,7 @@ define([
     },
 
     render: function() {
-      this.template = _.template( $("#game-view").html(), { id: this.id } );
       this.playerListView.render();
-      this.$el.html(this.template);
       return this;
     },
 

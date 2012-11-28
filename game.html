@@ -68,11 +68,7 @@
       <% }); %>
       <div id='new-round-timer'></div>
     </script>
-    <script id='game-view' type='text/template'>
-      <h3>Here is the GameView for game id: <%= id %></h3>
-    </script>
     <script id="players-card-view" type="text/template">
-      <h5>Player Cards</h5>
       <div>
         <% _.each(cards.toJSON(), function(card) { %>
           <div class="player-whitecard" data-id=<%= card.socketid %>><%= card.text %></div>
@@ -88,7 +84,6 @@
       </div>
     </script>
     <script id="black-card-in-play-view" type="text/template">
-      <h5>blackcard In Play</h5>
       <ul>
         <% _.each(cards.toJSON(), function(card) { %>
           <li class="blackcard inplay" data-id=<%= card.socketid %>><%= card.text %></li>
@@ -104,22 +99,16 @@
       </div>
     </script>
     <script id='players-list-view' type='text/template'>
-      <table class='table table-hover'>
-        <thead>
-          <tr>
-            <th>Name</th><th>Socket ID</th><th>Points</th>
-          </tr>
-        </thead>
-        <tbody>
+      <div id='players-list'>
+        <ul>
           <% _.each(players.toJSON(), function(player, id) { %>
-            <tr <% if( player.hasPlayed === true ) { print( 'class="hasPlayed"' ); } else if( player.isCzar ) { print( 'class="isCzar"' ); } %> data-id=<%= id %>>
-              <td data-prop="name" ><%= player.name %></td>
-              <td data-prop="socketid"><%= player.socketid %></td>
-              <td data-prop="awesomePoints"><%= player.awesomePoints %></td>
-            </tr>
+            <li <% if( player.hasPlayed === true ) { print( 'class="hasPlayed"' ); } else if( player.isCzar ) { print( 'class="isCzar"' ); } %> data-id=<%= id %>>
+              <span data-prop="name" ><%= player.name %></span>&nbsp;
+              <span data-prop="awesomePoints"><%= player.awesomePoints %></span>
+            </li>
           <% }); %>
-        </tbody>
-    </table>
+        </ul>
+      </div>
     </script>
 
   <!-- Prompt IE 6 users to install Chrome Frame. Remove this if you support IE 6.
