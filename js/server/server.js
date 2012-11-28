@@ -1,8 +1,8 @@
 /* this is the file thats on the server running socket.io.
 * putting it here for version control and because ST2
 * is a way better IDE than vim. */
-var io = require('socket.io'),
-    express = require('express'),
+var io = require('C:\\Users\\IGEN721\\NODE\\node_modules\\socket.io'),
+    express = require('C:\\Users\\IGEN721\\NODE\\node_modules\\express'),
     app = express.createServer(),
     games = {},
     gamesInProgress = 0,
@@ -64,20 +64,22 @@ sio.sockets.on( 'connection', function( socket ) {
 		console.log( 'update room request received for ' + game.id );
 		games[game.id] = game;
 		sio.sockets.in( game.id ).emit( 'update room', game );
+	});
 
-/*		if( isOlderThan( 5, lastUpdate ) ) {
-			//go ahead and update since its older than 5 seconds
-			games[game.id].updates = {
-				'update room': new Date()
-			};
-		} else {
-			//if the update is newer than 5 seconds, don't update
-			console.log( 'game is new enough, not updating' );
-			games[game.id].updates = {
-				'update room': lastUpdate
-			};
-		}
-*/	});
+	socket.on( 'new round', function( game ) {
+		console.log( 'new round for ' + game.id );
+    for( var i = 0; i < game.players.length; i++ ) {
+    	game.players[i].cardsInPlay = [];
+    	game.players[i].whitecards = [];
+    	game.players[i].isWinner = false;
+    	game.players[i].isCzar = false;
+    	game.players[i].hasPlayed = false;
+    	game.players[i].hasDrawnBlackCard = false;
+    	game.players[i].czarSetForCurrentRound = false;
+    }
+		games[game.id] = game;
+		sio.sockets.in( game.id ).emit( 'new round', game );
+	});
 
 	socket.on( 'update server listing', function( game ) {
 		games[game.id] = game;
