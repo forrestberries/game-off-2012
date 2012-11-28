@@ -1,2 +1,4 @@
 # ignore MAC folder garbage
 .DS_Store
+# ignore local node modules
+node_modules/

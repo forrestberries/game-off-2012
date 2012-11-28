@@ -13,7 +13,6 @@ define(['jquery', 'backbone', 'collections/WhiteCardsCollection', 'collections/B
     render: function() {
       console.log( '%cCardsInPlayView.render()', 'color: blue;' );
       this.template = _.template( $("#cards-in-play-view").html(),  { cards: this.collection } );
-      console.log( this.template);
       this.$el.html(this.template);
       return this;
     },

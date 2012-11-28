@@ -54,7 +54,6 @@ define([
     },
 
     render: function() {
-      console.log( 'GameView.render()' );
       this.template = _.template( $("#game-view").html(), { id: this.id } );
       this.playerListView.render();
       this.$el.html(this.template);
@@ -67,44 +66,45 @@ define([
       if( !alreadyHidden ) {
         self.gameWaitingView.hideModal();
       }
-      //SOME BULLSHIT CONDITION CHECKS COMIN' UP BRO.
-      //condition so the beginRound code is only executed by one client
-      //Not sure how else to do this...
-      console.log( 'is this person the game host', !!self.player.get( 'gameHost' ));
+
       if( !!self.player.get( 'gameHost' ) ) {
         if( !self.player.get( 'czarSetForCurrentRound' ) )  {
-          //choose the czar
           self.player.set({'czarSetForCurrentRound': true});
-          self.game.chooseCzar( self, function() {
-
+            self.game.chooseCzar( self, function() {
           });
         }
       }
-      if( self.game.get( 'czarSetForCurrentRound' ) ) {
-        console.log( 'is this person the czar', !!self.player.get( 'isCzar' ));
-        if( self.player.get( 'isCzar' ) ) {
-          if( !self.czarView ) {
-            self.czarView = new CzarView({ collection: self.game.get( 'allCardsInPlay' ), game:self.game, player: self.player }).render();
-          } else {
-            console.log( 'cards in play', self.game.get( 'allCardsInPlay' ) ) ;
-            self.czarView.updateCards( self.game.get( 'allCardsInPlay' ) );
-          }
-        } else { //player is NOT the czar
-          //draw some white cards once
-          console.log( 'here the player is the czar ', !!self.player.get( 'isCzar' ) );
-          if( self.player.get( 'whitecards' ).length < 1 ) {
-            self.game.drawWhiteCards( self );
+      if( self.game.get( 'inProgress' ) ) {
+        if( self.game.get( 'czarSetForCurrentRound' ) ) {
+          if( self.player.get( 'isCzar' ) ) {
+            if( !self.czarView ) {
+              self.czarView = new CzarView({ collection: self.game.get( 'allCardsInPlay' ), game:self.game, player: self.player }).render();
+            } else {
+              self.czarView.updateCards( self.game.get( 'allCardsInPlay' ) );
+            }
+          } else { //player is NOT the czar
+            //draw some white cards once
+            if( self.player.get( 'whitecards' ).length < 1 ) {
+              self.game.drawWhiteCards( self );
+            }
           }
         }
+      } else {
+        //reset old child views
+        if( self.czarView ) {
+          self.czarView.trigger( 'clear' );
+        }
+        console.log( 'resetting playerCardView' );
+        self.playerCardView.trigger( 'clear' );
+        self.blackCardInPlayView.trigger( 'clear' );
       }
 
       self.blackCardInPlayView.updateCards( self.game.get( 'blackCardsInPlay' ) );
     },
 
     updateRoom: function( data, self ) {
-      console.log( 'client updating game' );
+      console.log( '%cUpdate Room', 'color: blue;' );
       console.log( data );
-
       this.playerListView.update( data.players );
 
       self.game.updateGamePlayers( data, self );
@@ -132,10 +132,8 @@ define([
       });
 
       self.socket.on( 'blackcard chosen', function( data ) {
-        console.log( 'on blackcard chosen ', data );
         self.game.set({ 'blackCardsInPlay': new BlackCardsCollection( new BlackCardModel( data.blackCardsInPlay[0] ) ) });
         self.blackCardInPlayView.updateCards( self.game.get( 'blackCardsInPlay' ) );
-        console.log( self.game );
         self.socket.emit( 'update room', self.game );
       });
       self.socket.on( 'player update', function( players ) {
@@ -174,7 +172,6 @@ define([
     },
 
     syncFromLocalStorage: function() {
-      console.log( 'GameView.syncFromLocalStorage()' );
       var gameFromLocalStorageJson = JSON.parse( localStorage.getItem( 'game' ) );
           playerSettingsJson = JSON.parse( localStorage.getItem( 'playerSettings' ) ),
           name = '', //can get player name from PlayerSettings
@@ -216,6 +213,7 @@ define([
         );
       }
       self.player = player;
+      this.game.set({ inProgress: true });
       window.CAH.socket = self.socket;
       self.spawnChildViews();
     }

@@ -3,8 +3,14 @@ define(['jquery', 'backbone', 'collections/WhiteCardsCollection'], function($, B
 
     el: "section#czarCardsInPlay",
 
+    resetView: function() {
+      this.collection.reset();
+      this.remove();
+    },
+
     initialize: function() {
       var self = this;
+      this.on( 'clear', this.resetView );
       this.collection.on( 'add remove change reset', function( data ) {
         self.render();
       });
@@ -37,11 +43,19 @@ define(['jquery', 'backbone', 'collections/WhiteCardsCollection'], function($, B
         }
         return theyHave;
       };
-      if( allPlayersHavePlayed() ) {
+      if( allPlayersHavePlayed() && self.options.game.get( 'inProgress' ) ) {
         var card = $( event.target ),
             cardText = card.text(),
             socketid = card.data( 'id' );
-        self.options.game.get( 'players' ).get( socketid ).set({ 'awesomePoints': self.options.game.get( 'players' ).get( socketid ).get( 'awesomePoints' ) + 1 });
+
+        self.options.game.set({ 
+          'inProgress': false
+        });
+        self.options.game.get( 'players' ).get( socketid ).set({ 
+          'awesomePoints': self.options.game.get( 'players' ).get( socketid ).get( 'awesomePoints' ) + 1,
+          'isWinner': true
+        });
+        console.log( 'black card chosen', this.options.game );
         window.CAH.socket.emit( 'update room', this.options.game );
       }
     }
