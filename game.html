@@ -43,6 +43,7 @@
     <section id="players"></section>
     <section id="main" class="container">
     </section>
+    <section id="endRound"></section>
     <section id="blackCardInPlay"></section>
     <section id="cards"></section>
     <section id="cardsInPlay"></section>
@@ -58,6 +59,14 @@
           <p>The game will start when at least 3 players have joined.</p>
         </div>
       </div>
+    </script>
+    <script id='end-round' type="text/template">
+      <h1>Round Over</h1>
+      <p><%= player.name %> won that round with <%= winningResponse %></p>
+      <% _.each(allResponses, function(response) { %>
+        <div class="player-whitecard"><%= response %></div>
+      <% }); %>
+      <div id='new-round-timer'></div>
     </script>
     <script id='game-view' type='text/template'>
       <h3>Here is the GameView for game id: <%= id %></h3>
