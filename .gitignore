@@ -2,3 +2,5 @@
 .DS_Store
 # ignore local node modules
 node_modules/
+#styles.css is compiled, no reason to track it
+styles.css
