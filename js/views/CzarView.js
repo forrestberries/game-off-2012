@@ -5,7 +5,7 @@ define(['jquery', 'backbone', 'collections/WhiteCardsCollection'], function($, B
 
     resetView: function() {
       this.collection.reset();
-      this.remove();
+      this.$el.empty();
     },
 
     initialize: function() {
@@ -46,16 +46,23 @@ define(['jquery', 'backbone', 'collections/WhiteCardsCollection'], function($, B
       if( allPlayersHavePlayed() && self.options.game.get( 'inProgress' ) ) {
         var card = $( event.target ),
             cardText = card.text(),
-            socketid = card.data( 'id' );
+            socketid = card.data( 'id' ),
+            responseArray = [];
 
-        self.options.game.set({ 
+
+        for( var k = 0; k < self.options.game.get( 'allCardsInPlay' ).length; k++ ) {
+          responseArray.push( self.options.game.get( 'allCardsInPlay' ).models[k].get( 'text' ) );
+        }
+        self.options.game.get( 'blackCardsInPlay' ).models[0].set({
+          'responses': responseArray
+        });
+        self.options.game.set({
           'inProgress': false
         });
-        self.options.game.get( 'players' ).get( socketid ).set({ 
+        self.options.game.get( 'players' ).get( socketid ).set({
           'awesomePoints': self.options.game.get( 'players' ).get( socketid ).get( 'awesomePoints' ) + 1,
           'isWinner': true
         });
-        console.log( 'black card chosen', this.options.game );
         window.CAH.socket.emit( 'update room', this.options.game );
       }
     }

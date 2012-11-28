@@ -50,6 +50,11 @@ define(["jquery",
             self.socket.emit( 'blackcard chosen', self.game, self.game.get( 'blackCardsInPlay' ).models );
           });
         } else {
+          if( bcip.length > 0 ) {
+            bcip.models[0].set({
+              'responses': data.blackCardsInPlay[0].responses
+            });
+          }
           self.game.set({
             "blackCardsInPlay": bcip
           });
@@ -69,7 +74,6 @@ define(["jquery",
       },
 
       updateGamePlayers: function( data, self ) {
-        console.log( 'GameView.updateGamePlayers()' );
         var newPlayers = data.players,
             newPlayersCollection = new PlayersCollection(),
             allCardsInPlay = new WhiteCardsCollection();
@@ -160,17 +164,13 @@ define(["jquery",
       // Default values for all of the Game Model attributes
       defaults: {
 
-        players: [],
-
-        //id: "",
-
         currentRound: 1,
 
         awesomePoints: 0,
 
         name: "",
 
-        location: {},
+        location: {}
 
         //blackCardsInPlay: []
 

@@ -17,7 +17,7 @@ define(['jquery', 'backbone', 'collections/WhiteCardsCollection'], function($, B
 
     resetView: function() {
       this.collection.reset();
-      this.remove();
+      this.$el.empty();
     },
 
     playWhiteCard: function( event ) {

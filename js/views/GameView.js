@@ -14,9 +14,10 @@ define([
   'views/CardsInPlayView',
   'views/BlackCardInPlayView',
   'views/CzarView',
+  'views/EndRoundView',
   'collections/WhiteCardsCollection',
   'collections/BlackCardsCollection',
-  'models/DeckModel'], function($, Backbone, Socket, PlayersCollection, PlayerModel, LocationModel, GameModel, BlackCardModel, PlayerListView, PlayerCardView, GameWaitingView, CardsInPlayView, BlackCardInPlayView, CzarView, WhiteCardsCollection, BlackCardsCollection, DeckModel){
+  'models/DeckModel'], function($, Backbone, Socket, PlayersCollection, PlayerModel, LocationModel, GameModel, BlackCardModel, PlayerListView, PlayerCardView, GameWaitingView, CardsInPlayView, BlackCardInPlayView, CzarView, EndRoundView, WhiteCardsCollection, BlackCardsCollection, DeckModel){
   var View = Backbone.View.extend({
 
     el: "section#main",
@@ -90,13 +91,22 @@ define([
           }
         }
       } else {
-        //reset old child views
-        if( self.czarView ) {
-          self.czarView.trigger( 'clear' );
+        var needToReset = self.game.get( 'czarSetForCurrentRound' );
+        if( needToReset ) {
+          //reset old child views
+          if( self.czarView ) {
+            self.czarView.trigger( 'clear' );
+          }
+          console.log( 'resetting playerCardView' );
+          self.playerCardView.trigger( 'clear' );
+          self.blackCardInPlayView.trigger( 'clear' );
+          //set up and display end round view
+          self.endRoundView = new EndRoundView({
+            collection: self.game.get( 'players' ),
+            game: self.game,
+            player: self.player
+          });
         }
-        console.log( 'resetting playerCardView' );
-        self.playerCardView.trigger( 'clear' );
-        self.blackCardInPlayView.trigger( 'clear' );
       }
 
       self.blackCardInPlayView.updateCards( self.game.get( 'blackCardsInPlay' ) );
@@ -140,6 +150,21 @@ define([
 
       });
 
+      self.socket.on( 'new round', function( data ) {
+        //actions that need to take place for e'erybody.
+        self.player.set({
+          'cardsInPlay': new WhiteCardsCollection(),
+          'isCzar': false,
+          'isWinner': false,
+          'hasPlayed': false,
+          'hasDrawnBlackCard': false,
+          'whitecards': new WhiteCardsCollection(),
+          'czarSetForCurrentRound': false
+        });
+        self.spawnChildViews();
+        self.updateRoom( data, self );
+      });
+
       self.socket.on( 'update room', function( data ) {
         self.updateRoom( data, self );
       });
@@ -162,13 +187,11 @@ define([
     },
 
     spawnChildViews: function() {
-      //this.cardsInPlayView = new CardsInPlayView({ collection: this.player.get( 'cardsInPlay' )});
       this.playerCardView = new PlayerCardView( { collection: this.player.get( 'whitecards' ), game: this.game, player: this.player } );
       this.blackCardInPlayView = new BlackCardInPlayView({ collection: this.game.get( 'blackCardsInPlay' ) });
       this.playerListView = new PlayerListView( { collection: this.game.get( 'players' ) } );
       this.playerListView.socket = this.socket;
       this.playerListView.collection.url = 'http://' + window.CAH.serverhost + '/games/id/' + this.id + '/players';
-
     },
 
     syncFromLocalStorage: function() {

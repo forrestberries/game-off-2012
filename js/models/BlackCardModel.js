@@ -4,16 +4,14 @@ define(["jquery", "backbone", "models/CardModel"], function($, Backbone, Card) {
 
         // Model Constructor
         initialize: function() {
-             
-
+            this.responses = [];
         },
 
         // Default values for all of the BlackCard:Card Model attributes
         defaults: {
 
             isPickTwo: false,
-            isPickThree: false,
-            responses: []
+            isPickThree: false
 
         }
 

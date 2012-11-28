@@ -16,11 +16,10 @@ define(['jquery', 'backbone', 'collections/BlackCardsCollection'], function($, B
 
     resetView: function() {
       this.collection.reset();
-      this.remove();
+      this.$el.empty();
     },
 
     render: function() {
-      console.log( '%cBlackCardInPlayView.render()', 'color: blue;' );
       this.template = _.template( $("#black-card-in-play-view").html(),  {  cards: this.collection } );
       this.$el.html(this.template);
       return this;

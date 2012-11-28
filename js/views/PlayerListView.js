@@ -27,7 +27,6 @@ define(['jquery', 'backbone', 'collections/PlayersCollection'], function($, Back
     },
 
     render: function() {
-      console.log( '%cPlayerListView.render()', 'color: red;' );
       this.template = _.template( $("#players-list-view").html(),  {  players: this.collection } );
       this.$el.html(this.template);
       return this;
