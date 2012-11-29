@@ -25,7 +25,7 @@ define([
     initialize: function( id ) {
       console.info( 'GameView initialize()' );
       var self = this,
-          socket = io.connect( 'http://localhost:20080' );
+          socket = io.connect( 'http://' + window.CAH.serverhost );
 
       this.id = id;
       if( !window.CAH ) {
@@ -62,26 +62,22 @@ define([
     gameInProgress: function( self ) {
       var alreadyHidden = ( $( '#waiting-msg' ).css( 'display' ) == 'none' ),
           playerIsHost = !!self.player.get( 'gameHost' ),
-          playerIsCzar = self.player.get( 'isCzar' ),
-          czarIsNotSet = !self.player.get( 'czarSetForCurrentRound' ),
-          czarIsSet = !czarIsNotSet,
-          gameIsInProgress = self.game.get( 'inProgress' ),
-          needToDrawCards = (self.player.get( 'whitecards' ).length < 1 );
+          gameIsInProgress = self.game.get( 'inProgress' );
 
       if( !alreadyHidden ) {
         self.gameWaitingView.hideModal();
       }
 
-      if( playerIsHost ) {
-        if( czarIsNotSet )  {
+      if( !!self.player.get( 'gameHost' ) ) {
+        if( !self.player.get( 'czarSetForCurrentRound' ) )  {
           self.player.set({'czarSetForCurrentRound': true});
             self.game.chooseCzar( self, function() {
           });
         }
       }
-      if( gameIsInProgress ) {
-        if( czarIsSet ) {
-          if( playerIsCzar ) {
+      if( self.game.get( 'inProgress' ) ) {
+        if( self.game.get( 'czarSetForCurrentRound' ) ) {
+          if( self.player.get( 'isCzar' ) ) {
             if( !self.czarView ) {
               self.czarView = new CzarView({ collection: self.game.get( 'allCardsInPlay' ), game:self.game, player: self.player }).render();
             } else {
@@ -89,7 +85,7 @@ define([
             }
           } else { //player is NOT the czar
             //draw some white cards once
-            if( needToDrawCards ) {
+            if( self.player.get( 'whitecards' ).length < 1 ) {
               self.game.drawWhiteCards( self );
             }
           }
@@ -116,6 +112,7 @@ define([
     },
 
     updateRoom: function( data, self ) {
+      console.log( 'update room data', data );
       var dontAllowPlayerToJoin = self.game.hasAnyonePlayed() && !self.player.get( 'isPlaying' );
 
       this.playerListView.update( data.players );

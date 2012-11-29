@@ -18,9 +18,7 @@ define(["jquery",
       },
 
       hasAnyonePlayed: function() {
-        console.log( 'this.players', this.get( 'players' ) );
         for( var i = 0; i < this.get( 'players' ).length; i++ ) {
-          console.log( 'hasPlayed', this.get( 'players' ).models[i].get( 'hasPlayed' ) );
           if( this.get( 'players' ).models[i].get( 'hasPlayed' ) ) {
             return true;
           }
@@ -121,17 +119,12 @@ define(["jquery",
       },
 
       newPlayer: function( player, self ) {
-        console.group( '%cNew Player', 'color: green;' );
         var newPlayer = new PlayerModel( player );
         if( !self.player ) {
           self.player = newPlayer;
         }
         self.playerListView.addPlayer( newPlayer );
         self.game.get( "players" ).add( newPlayer );
-
-        console.log( "%c-----players-----", "color: blue;" );
-        console.log( self.game.get( 'players' ) );
-        console.groupEnd();
 
         self.socket.emit( 'update room', self.game );
       },
