@@ -3,8 +3,14 @@ define(['jquery', 'backbone', 'collections/WhiteCardsCollection'], function($, B
 
     el: "section#czarCardsInPlay",
 
+    resetView: function() {
+      this.collection.reset();
+      this.$el.empty();
+    },
+
     initialize: function() {
       var self = this;
+      this.on( 'clear', this.resetView );
       this.collection.on( 'add remove change reset', function( data ) {
         self.render();
       });
@@ -31,17 +37,32 @@ define(['jquery', 'backbone', 'collections/WhiteCardsCollection'], function($, B
         var theyHave = true;
         var players = self.options.game.get( 'players' );
         for( var i = 0; i < players.length; i++ ) {
-          if( !players.models[i].get( 'hasPlayed' ) && !players.models[i].get( 'isCzar' ) ) {
+          if( !players.models[i].get( 'hasPlayed' ) && !players.models[i].get( 'isCzar' ) && players.models[i].get( 'isPlaying' ) ) {
             theyHave = false;
           }
         }
         return theyHave;
       };
-      if( allPlayersHavePlayed() ) {
+      if( allPlayersHavePlayed() && self.options.game.get( 'inProgress' ) ) {
         var card = $( event.target ),
             cardText = card.text(),
-            socketid = card.data( 'id' );
-        self.options.game.get( 'players' ).get( socketid ).set({ 'awesomePoints': self.options.game.get( 'players' ).get( socketid ).get( 'awesomePoints' ) + 1 });
+            socketid = card.data( 'id' ),
+            responseArray = [];
+
+
+        for( var k = 0; k < self.options.game.get( 'allCardsInPlay' ).length; k++ ) {
+          responseArray.push( self.options.game.get( 'allCardsInPlay' ).models[k].get( 'text' ) );
+        }
+        self.options.game.get( 'blackCardsInPlay' ).models[0].set({
+          'responses': responseArray
+        });
+        self.options.game.set({
+          'inProgress': false
+        });
+        self.options.game.get( 'players' ).get( socketid ).set({
+          'awesomePoints': self.options.game.get( 'players' ).get( socketid ).get( 'awesomePoints' ) + 1,
+          'isWinner': true
+        });
         window.CAH.socket.emit( 'update room', this.options.game );
       }
     }

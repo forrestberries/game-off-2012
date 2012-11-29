@@ -64,20 +64,22 @@ sio.sockets.on( 'connection', function( socket ) {
 		console.log( 'update room request received for ' + game.id );
 		games[game.id] = game;
 		sio.sockets.in( game.id ).emit( 'update room', game );
+	});
 
-/*		if( isOlderThan( 5, lastUpdate ) ) {
-			//go ahead and update since its older than 5 seconds
-			games[game.id].updates = {
-				'update room': new Date()
-			};
-		} else {
-			//if the update is newer than 5 seconds, don't update
-			console.log( 'game is new enough, not updating' );
-			games[game.id].updates = {
-				'update room': lastUpdate
-			};
-		}
-*/	});
+	socket.on( 'new round', function( game ) {
+		console.log( 'new round for ' + game.id );
+    for( var i = 0; i < game.players.length; i++ ) {
+    	game.players[i].cardsInPlay = [];
+    	game.players[i].whitecards = [];
+    	game.players[i].isWinner = false;
+    	game.players[i].isCzar = false;
+    	game.players[i].hasPlayed = false;
+    	game.players[i].hasDrawnBlackCard = false;
+    	game.players[i].czarSetForCurrentRound = false;
+    }
+		games[game.id] = game;
+		sio.sockets.in( game.id ).emit( 'new round', game );
+	});
 
 	socket.on( 'update server listing', function( game ) {
 		games[game.id] = game;
@@ -237,54 +239,4 @@ app.get( '/games/id/:id', function( req, res ) {
 	response.games = respGames;
 	res.json( response );
 });
-
-function fillGamesWithTestData() {
-	var game1 = {};
-	game1.location = {};
-	game1.players = 2;
-	game1.id = 1;
-	game1.location.lat = '41.250545';
-	game1.location.lon = '-96.01308';
-	fakeGameArray.push( game1 );
-
-	var game2 = {};
-	game2.location = {};
-	game2.players = 2;
-	game2.id = 2;
-	game2.location.lat = '41.250540';
-	game2.location.lon = '-96.01300';
-	fakeGameArray.push( game2 );
-
-	var game3 = {};
-	game3.location = {};
-	game3.players = 2;
-	game3.id = 3;
-	game3.location.lat = '41.200000';
-	game3.location.lon = '-96.01330';
-	fakeGameArray.push( game3 );
-
-	var game4 = {};
-	game4.location = {};
-	game4.players = 3;
-	game4.id = 4;
-	game4.location.lat = '41.204999';
-	game4.location.lon = '-96.01330';
-	fakeGameArray.push( game4 );
-
-	var game5 = {};
-	game5.location = {};
-	game5.players = 4;
-	game5.id = 5;
-	game5.location.lat = '41.251000';
-	game5.location.lon = '-96.01310';
-	fakeGameArray.push( game5 );
-
-	var game6 = {};
-	game6.location = {};
-	game6.players = 1;
-	game6.id = 6;
-	game6.location.lat = '41.250530';
-	game6.location.lon = '-96.01430';
-	fakeGameArray.push( game6 );
-}
 

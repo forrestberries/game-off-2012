@@ -37,12 +37,13 @@
 </head>
 <body>
     <header class="navbar nav navbar-inner">
-        <!-- <h1>Cards Against Humanity</h1> -->
+        <h1>Cards Against Humanity</h1>
     </header>
     <div id='waiting-modal'></div>
     <section id="players"></section>
     <section id="main" class="container">
     </section>
+    <section id="endRound"></section>
     <section id="blackCardInPlay"></section>
     <section id="cards"></section>
     <section id="cardsInPlay"></section>
@@ -59,11 +60,15 @@
         </div>
       </div>
     </script>
-    <script id='game-view' type='text/template'>
-      <h3>Here is the GameView for game id: <%= id %></h3>
+    <script id='end-round' type="text/template">
+      <h1>Round Over</h1>
+      <p><%= player.name %> won that round with <%= winningResponse %></p>
+      <% _.each(allResponses, function(response) { %>
+        <div class="player-whitecard"><%= response %></div>
+      <% }); %>
+      <div id='new-round-timer'></div>
     </script>
     <script id="players-card-view" type="text/template">
-      <h5>Player Cards</h5>
       <div>
         <% _.each(cards.toJSON(), function(card) { %>
           <div class="player-whitecard" data-id=<%= card.socketid %>><%= card.text %></div>
@@ -79,7 +84,6 @@
       </div>
     </script>
     <script id="black-card-in-play-view" type="text/template">
-      <h5>blackcard In Play</h5>
       <ul>
         <% _.each(cards.toJSON(), function(card) { %>
           <li class="blackcard inplay" data-id=<%= card.socketid %>><%= card.text %></li>
@@ -95,6 +99,7 @@
       </div>
     </script>
     <script id='players-list-view' type='text/template'>
+<<<<<<< HEAD
       <table class='game-player-table table table-hover'>
         <thead>
           <tr>
@@ -102,15 +107,18 @@
           </tr>
         </thead>
         <tbody>
+=======
+      <div id='players-list'>
+        <ul>
+>>>>>>> 165c268bc4e840474df5d055df95fe175e6446ba
           <% _.each(players.toJSON(), function(player, id) { %>
-            <tr class="props" <% if( player.hasPlayed ) { print( 'class="hasPlayed"' ); } else if( player.isCzar ) { print( 'class="isCzar"' ); } %> data-id=<%= id %>>
-              <td data-prop="name" ><%= player.name %></td>
-              <td data-prop="socketid"><%= player.socketid %></td>
-              <td data-prop="awesomePoints"><%= player.awesomePoints %></td>
-            </tr>
+            <li <% if( player.hasPlayed === true ) { print( 'class="hasPlayed"' ); } else if( player.isCzar ) { print( 'class="isCzar"' ); } %> data-id=<%= id %>>
+              <span data-prop="name" ><%= player.name %></span>&nbsp;
+              <span data-prop="awesomePoints"><%= player.awesomePoints %></span>
+            </li>
           <% }); %>
-        </tbody>
-    </table>
+        </ul>
+      </div>
     </script>
 
   <!-- Prompt IE 6 users to install Chrome Frame. Remove this if you support IE 6.

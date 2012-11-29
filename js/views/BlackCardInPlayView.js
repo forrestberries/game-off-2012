@@ -5,6 +5,7 @@ define(['jquery', 'backbone', 'collections/BlackCardsCollection'], function($, B
 
     initialize: function() {
       var self = this;
+      this.on( 'clear', this.resetView );
       this.collection.on( 'add remove change reset', function( data ) {
         self.render();
       });
@@ -13,10 +14,13 @@ define(['jquery', 'backbone', 'collections/BlackCardsCollection'], function($, B
     events: {
     },
 
+    resetView: function() {
+      this.collection.reset();
+      this.$el.empty();
+    },
+
     render: function() {
-      console.log( '%cBlackCardInPlayView.render()', 'color: blue;' );
       this.template = _.template( $("#black-card-in-play-view").html(),  {  cards: this.collection } );
-      console.log( this.template);
       this.$el.html(this.template);
       return this;
     },

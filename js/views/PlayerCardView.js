@@ -5,7 +5,8 @@ define(['jquery', 'backbone', 'collections/WhiteCardsCollection'], function($, B
 
     initialize: function() {
       var self = this;
-      this.collection.on( 'add remove change set', function( data ) {
+      this.on( 'clear', this.resetView );
+      this.collection.on( 'add remove change reset', function( data ) {
         self.render();
       });
     },
@@ -13,18 +14,22 @@ define(['jquery', 'backbone', 'collections/WhiteCardsCollection'], function($, B
     events: {
       'click .player-whitecard': 'playWhiteCard'
     },
+
+    resetView: function() {
+      this.collection.reset();
+      this.$el.empty();
+    },
+
     playWhiteCard: function( event ) {
       if( !this.options.player.get( 'hasPlayed' ) ) {
         var card = $( event.target ),
             self = this,
             cardText = card.text(),
             socketid = card.data( 'id' );
-        console.log( 'PlayerCardView.playWhiteCard(): socket of person who owns me ' + socketid );
         var cardsArr,
             target = -1;
 
         cardsArr = this.options.player.get( 'whitecards' );
-        console.log( cardsArr );
         for( var i = 0; i < cardsArr.length; i++ ) {
           var currentText = cardsArr.models[i].get( 'text' );
           if( ( currentText.indexOf( cardText ) > -1 ) && ( currentText.length == cardText.length ) ) {
@@ -32,7 +37,6 @@ define(['jquery', 'backbone', 'collections/WhiteCardsCollection'], function($, B
             break;
           }
         }
-        console.log( cardsArr, target);
         var targetCard = cardsArr.models[target];
         targetCard.set({
           'playPosition': self.options.game.get( 'players' ).get( socketid ).get( 'cardsInPlay' ).length + 1,
@@ -53,16 +57,11 @@ define(['jquery', 'backbone', 'collections/WhiteCardsCollection'], function($, B
             'hasPlayed': true
           });
 
-        console.log( '%cEND OF PLAYING WHITE CARD', 'color:#CA0;font-weight:bold;' );
-        console.log( this.options.player );
-        console.log( this.options.game );
-
         window.CAH.socket.emit( 'update room', this.options.game );
       }
     },
 
     render: function() {
-      console.log( '%cPlayerCardView.render()', 'color: blue;' );
       this.template = _.template( $("#players-card-view").html(),  {  cards: this.collection } );
       this.$el.html(this.template);
       return this;

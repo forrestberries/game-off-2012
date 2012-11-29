@@ -12,15 +12,27 @@ body {
 .hidden {
   display: none;
 }
-.isCzar {
-  td {
-    color: red;
-  }
-}
 
-.hasPlayed {
-  td {
-    background-color: yellow;
+#players-list {
+  margin-top: -20px;
+  ul {
+    list-style: none;
+  }
+  li {
+    background-color: white;
+    color: black;
+    display: inline-block;
+    padding: 6px;
+    .border-radius( 0px, 8px, 8px, 0px );
+    .bordered( #d4d4d4, #d4d4d4, #d4d4d4, #d4d4d4 );
+
+    &.isCzar {
+      background-color: black;
+      color: white;
+    }
+    &.hasPlayed {
+      background-color: #EEE;
+    }
   }
 }
 
@@ -72,12 +84,9 @@ body {
   background-color: #000;
   color:#FFF;
   width:150px;
-  height:200px;
-  margin-right:10px;
-  margin-bottom:10px;
-  float:left;
-  padding: 15px;
+  padding: 5px;
   .rounded( 5px );
+  display: inline-block;
 }
 @media screen and (max-width: 373px) {
   h1 {

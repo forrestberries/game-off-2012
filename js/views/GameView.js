@@ -14,9 +14,10 @@ define([
   'views/CardsInPlayView',
   'views/BlackCardInPlayView',
   'views/CzarView',
+  'views/EndRoundView',
   'collections/WhiteCardsCollection',
   'collections/BlackCardsCollection',
-  'models/DeckModel'], function($, Backbone, Socket, PlayersCollection, PlayerModel, LocationModel, GameModel, BlackCardModel, PlayerListView, PlayerCardView, GameWaitingView, CardsInPlayView, BlackCardInPlayView, CzarView, WhiteCardsCollection, BlackCardsCollection, DeckModel){
+  'models/DeckModel'], function($, Backbone, Socket, PlayersCollection, PlayerModel, LocationModel, GameModel, BlackCardModel, PlayerListView, PlayerCardView, GameWaitingView, CardsInPlayView, BlackCardInPlayView, CzarView, EndRoundView, WhiteCardsCollection, BlackCardsCollection, DeckModel){
   var View = Backbone.View.extend({
 
     el: "section#main",
@@ -54,47 +55,60 @@ define([
     },
 
     render: function() {
-      console.log( 'GameView.render()' );
-      this.template = _.template( $("#game-view").html(), { id: this.id } );
       this.playerListView.render();
-      this.$el.html(this.template);
       return this;
     },
 
     gameInProgress: function( self ) {
-      var alreadyHidden = ( $( '#waiting-msg' ).css( 'display' ) == 'none' );
+      var alreadyHidden = ( $( '#waiting-msg' ).css( 'display' ) == 'none' ),
+          playerIsHost = !!self.player.get( 'gameHost' ),
+          playerIsCzar = self.player.get( 'isCzar' ),
+          czarIsNotSet = !self.player.get( 'czarSetForCurrentRound' ),
+          czarIsSet = !czarIsNotSet,
+          gameIsInProgress = self.game.get( 'inProgress' ),
+          needToDrawCards = (self.player.get( 'whitecards' ).length < 1 );
 
       if( !alreadyHidden ) {
         self.gameWaitingView.hideModal();
       }
-      //SOME BULLSHIT CONDITION CHECKS COMIN' UP BRO.
-      //condition so the beginRound code is only executed by one client
-      //Not sure how else to do this...
-      console.log( 'is this person the game host', !!self.player.get( 'gameHost' ));
-      if( !!self.player.get( 'gameHost' ) ) {
-        if( !self.player.get( 'czarSetForCurrentRound' ) )  {
-          //choose the czar
-          self.player.set({'czarSetForCurrentRound': true});
-          self.game.chooseCzar( self, function() {
 
+      if( playerIsHost ) {
+        if( czarIsNotSet )  {
+          self.player.set({'czarSetForCurrentRound': true});
+            self.game.chooseCzar( self, function() {
           });
         }
       }
-      if( self.game.get( 'czarSetForCurrentRound' ) ) {
-        console.log( 'is this person the czar', !!self.player.get( 'isCzar' ));
-        if( self.player.get( 'isCzar' ) ) {
-          if( !self.czarView ) {
-            self.czarView = new CzarView({ collection: self.game.get( 'allCardsInPlay' ), game:self.game, player: self.player }).render();
-          } else {
-            console.log( 'cards in play', self.game.get( 'allCardsInPlay' ) ) ;
-            self.czarView.updateCards( self.game.get( 'allCardsInPlay' ) );
+      if( gameIsInProgress ) {
+        if( czarIsSet ) {
+          if( playerIsCzar ) {
+            if( !self.czarView ) {
+              self.czarView = new CzarView({ collection: self.game.get( 'allCardsInPlay' ), game:self.game, player: self.player }).render();
+            } else {
+              self.czarView.updateCards( self.game.get( 'allCardsInPlay' ) );
+            }
+          } else { //player is NOT the czar
+            //draw some white cards once
+            if( needToDrawCards ) {
+              self.game.drawWhiteCards( self );
+            }
           }
-        } else { //player is NOT the czar
-          //draw some white cards once
-          console.log( 'here the player is the czar ', !!self.player.get( 'isCzar' ) );
-          if( self.player.get( 'whitecards' ).length < 1 ) {
-            self.game.drawWhiteCards( self );
+        }
+      } else {
+        var needToReset = self.game.get( 'czarSetForCurrentRound' );
+        if( needToReset ) {
+          //reset old child views
+          if( self.czarView ) {
+            self.czarView.trigger( 'clear' );
           }
+          self.playerCardView.trigger( 'clear' );
+          self.blackCardInPlayView.trigger( 'clear' );
+          //set up and display end round view
+          self.endRoundView = new EndRoundView({
+            collection: self.game.get( 'players' ),
+            game: self.game,
+            player: self.player
+          });
         }
       }
 
@@ -102,8 +116,7 @@ define([
     },
 
     updateRoom: function( data, self ) {
-      console.log( 'client updating game' );
-      console.log( data );
+      var dontAllowPlayerToJoin = self.game.hasAnyonePlayed() && !self.player.get( 'isPlaying' );
 
       this.playerListView.update( data.players );
 
@@ -111,9 +124,13 @@ define([
       self.game.updateGameObjectFromData( self, data );
       self.game.updateCards( data, self );
 
-
-      if( self.game.gameCanBegin() ) {
-        self.gameInProgress( self );
+      if( dontAllowPlayerToJoin ) {
+        $( '#waiting-msg' ).find( '.modal-body' ).html( '<p>The game is in progress. You will automagically join for the next round.</p>' );
+      } else {
+        if( self.game.gameCanBegin() ) {
+          self.player.set({ 'isPlaying': true });
+          self.gameInProgress( self );
+        }
       }
 
       window.CAH.game = self.game;
@@ -132,14 +149,28 @@ define([
       });
 
       self.socket.on( 'blackcard chosen', function( data ) {
-        console.log( 'on blackcard chosen ', data );
         self.game.set({ 'blackCardsInPlay': new BlackCardsCollection( new BlackCardModel( data.blackCardsInPlay[0] ) ) });
         self.blackCardInPlayView.updateCards( self.game.get( 'blackCardsInPlay' ) );
-        console.log( self.game );
         self.socket.emit( 'update room', self.game );
       });
       self.socket.on( 'player update', function( players ) {
 
+      });
+
+      self.socket.on( 'new round', function( data ) {
+        //actions that need to take place for e'erybody.
+        self.player.set({
+          'cardsInPlay': new WhiteCardsCollection(),
+          'isCzar': false,
+          'isWinner': false,
+          'hasPlayed': false,
+          'isPlaying': true,
+          'hasDrawnBlackCard': false,
+          'whitecards': new WhiteCardsCollection(),
+          'czarSetForCurrentRound': false
+        });
+        self.spawnChildViews();
+        self.updateRoom( data, self );
       });
 
       self.socket.on( 'update room', function( data ) {
@@ -164,27 +195,22 @@ define([
     },
 
     spawnChildViews: function() {
-      //this.cardsInPlayView = new CardsInPlayView({ collection: this.player.get( 'cardsInPlay' )});
       this.playerCardView = new PlayerCardView( { collection: this.player.get( 'whitecards' ), game: this.game, player: this.player } );
       this.blackCardInPlayView = new BlackCardInPlayView({ collection: this.game.get( 'blackCardsInPlay' ) });
       this.playerListView = new PlayerListView( { collection: this.game.get( 'players' ) } );
       this.playerListView.socket = this.socket;
       this.playerListView.collection.url = 'http://' + window.CAH.serverhost + '/games/id/' + this.id + '/players';
-
     },
 
     syncFromLocalStorage: function() {
-      console.log( 'GameView.syncFromLocalStorage()' );
       var gameFromLocalStorageJson = JSON.parse( localStorage.getItem( 'game' ) );
           playerSettingsJson = JSON.parse( localStorage.getItem( 'playerSettings' ) ),
           name = '', //can get player name from PlayerSettings
           self = this;
 
       if( playerSettingsJson ) {
-        //lulz just for debuggins
-        name = playerSettingsJson.displayName + ( new Date().getMilliseconds() );
+        name = playerSettingsJson.displayName;
       } else {
-        //lulz just for debuggins
         //TODO
         name = 'bob' + ( new Date().getMilliseconds() );
       }
@@ -216,6 +242,7 @@ define([
         );
       }
       self.player = player;
+      this.game.set({ inProgress: true });
       window.CAH.socket = self.socket;
       self.spawnChildViews();
     }

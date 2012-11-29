@@ -35,6 +35,8 @@ define([
 
       socketid: "",
 
+      isPlaying: false,
+
       isCzar: false,
 
       isGambling: false,

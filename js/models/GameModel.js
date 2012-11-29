@@ -15,15 +15,17 @@ define(["jquery",
         this.set({ location: new Location() });
         this.set({ deck: new DeckModel() } );
         this.set({ 'blackCardsInPlay': new BlackCardsCollection() });
-        //this.location = new Location();
+      },
 
-        //this.location.on('change', function() { console.log(this.location); });
-         /*this.deck = new Deck();
-
-
-         this.gameOptions = new GameOptions();
-
-         this.czar = new Player();*/
+      hasAnyonePlayed: function() {
+        console.log( 'this.players', this.get( 'players' ) );
+        for( var i = 0; i < this.get( 'players' ).length; i++ ) {
+          console.log( 'hasPlayed', this.get( 'players' ).models[i].get( 'hasPlayed' ) );
+          if( this.get( 'players' ).models[i].get( 'hasPlayed' ) ) {
+            return true;
+          }
+        }
+        return false;
       },
 
       beginRound: function( self ) {
@@ -39,7 +41,6 @@ define(["jquery",
 
       chooseCzar: function( self, callback ) {
         var czarPosition = this.getRandomInt( 0, self.game.get( 'players' ).length - 1 );
-        console.log( 'The CZAR is : ', self.game.get( 'players' ).at( czarPosition ).get( 'name' ) );
         self.game.get( 'players' ).at( czarPosition ).set({ 'isCzar': true });
         self.socket.emit( 'czar chosen', self.game );
         callback();
@@ -49,7 +50,6 @@ define(["jquery",
         var wcc = new WhiteCardsCollection( data.deck.whitecards ),
             bcc = new BlackCardsCollection( data.deck.blackcards ),
             bcip = new BlackCardsCollection( data.blackCardsInPlay );
-        console.log( 'updating cards.... ', data, bcip );
         this.get( 'deck' ).set({
           "whitecards": wcc,
           "blackcards": bcc
@@ -57,12 +57,15 @@ define(["jquery",
         if( self.player.get( 'gameHost' ) && !self.player.get( 'hasDrawnBlackCard' ) ) {
           self.player.set({ 'hasDrawnBlackCard': true });
           self.game.drawBlackCard( self, function() {
-            console.log( self.game.get( 'blackCardsInPlay' ) );
             self.game.set({ 'blackCardsInPlay': self.game.get( 'blackCardsInPlay' ) });
-            console.log( self.game.get( 'blackCardsInPlay' ).models );
             self.socket.emit( 'blackcard chosen', self.game, self.game.get( 'blackCardsInPlay' ).models );
           });
         } else {
+          if( bcip.length > 0 ) {
+            bcip.models[0].set({
+              'responses': data.blackCardsInPlay[0].responses
+            });
+          }
           self.game.set({
             "blackCardsInPlay": bcip
           });
@@ -76,16 +79,15 @@ define(["jquery",
           'id': data.id,
           'location': data.location,
           'name': data.name,
+          'inProgress': data.inProgress,
           'czarSetForCurrentRound': data.czarSetForCurrentRound
         });
       },
 
       updateGamePlayers: function( data, self ) {
-        console.log( 'GameView.updateGamePlayers()' );
         var newPlayers = data.players,
             newPlayersCollection = new PlayersCollection(),
             allCardsInPlay = new WhiteCardsCollection();
-        console.log( data );
         for( var i = 0; i < newPlayers.length; i++ ) {
           var whites = new WhiteCardsCollection(),
               blacks = new BlackCardsCollection(),
@@ -141,7 +143,6 @@ define(["jquery",
               cardPosition = this.getRandomInt( 0, whitecards.length ),
               card = whitecards.at( cardPosition );
 
-          console.log( 'getting card at cardPosition ' + cardPosition );
 
           whitecards.remove( card );
           card.set({ 'socketid': self.player.id });
@@ -152,13 +153,10 @@ define(["jquery",
       },
 
       drawBlackCard: function( self, callback ) {
-        console.log( self );
         var blackcards = self.game.get( 'deck' ).get( 'blackcards' ),
             cardPosition = this.getRandomInt( 0, blackcards.length ),
             card = blackcards.at( cardPosition );
-        console.log( 'taco', self.game.get( 'blackCardsInPlay' ) );
         self.game.get( 'blackCardsInPlay' ).add( card );
-        console.log( 'taco', self.game.get( 'blackCardsInPlay' ) );
         self.game.set({ 'blackCardsInPlay': self.game.get( 'blackCardsInPlay' ) });
         blackcards.remove( card );
         callback();
@@ -177,27 +175,13 @@ define(["jquery",
       // Default values for all of the Game Model attributes
       defaults: {
 
-        players: [],
-
-        //id: "",
-
         currentRound: 1,
 
         awesomePoints: 0,
 
         name: "",
 
-        location: {},
-
-        //blackCardsInPlay: []
-
-        // deck
-
-        // location
-
-        // gameOptions
-
-        // czar (Player)
+        location: {}
 
       }
 
