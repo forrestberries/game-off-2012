@@ -11,6 +11,7 @@ define(['jquery',
     initialize: function() {
       var self = this;
       var userLoc = new Location();
+      var selectedGame = {};
       this.collection = new GamesCollection();
       this.collection.on('set change add remove reset', function() {
         self.render();
@@ -30,7 +31,6 @@ define(['jquery',
               $("#nearby-games").find("#loadingNearby").hide();
             }
           });
-
           var t = setTimeout(arguments.callee,10000);
           self.t = t;
         })();
@@ -38,7 +38,7 @@ define(['jquery',
     },
 
     events: {
-      'click .joinableGame': 'gameSelected'
+
     },
 
     render: function() {
@@ -46,9 +46,17 @@ define(['jquery',
       console.log( 'NearbyGamesView.render()' );
       var compiledTemplate = _.template( nearbyGamesHTML, { games: this.collection });
       $("#nearby-games").find("#gameTable").html(compiledTemplate);
+      $('.joinableGame').unbind('click'); // remove previous click listeners
       $('.joinableGame').on('click', function(event) {
         self.gameSelected(event,self);
       });
+
+      if(self.selectedGame) {
+        var prevRow = $('#nearby-games').find('#gameTable').find('tr[data-id="' + self.selectedGame + '"]');
+        if(prevRow)
+          prevRow.addClass('selected');
+      }
+
       // should loop through game Ids and see if it matches
       // a gameId previously selected, then add the selected
       // class to it
@@ -60,10 +68,12 @@ define(['jquery',
     },
 
     gameSelected: function( event, self ) {
+
       var gameEntry = $( event.target ).parent();
       // add selected class to row, remove from others
       gameEntry.addClass('selected').siblings().removeClass('selected');
       var gameId = $(gameEntry[0]).data('id');
+      self.selectedGame = gameId;
       self.trigger('gameChosen', gameId);
     }
   });

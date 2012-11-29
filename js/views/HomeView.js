@@ -29,7 +29,7 @@ define(['jquery',
     // creates a new game
     createGame: function() {
         var dispName = $("#displayNameCreate").val();
-        if(dispName === null || dispName === "") {
+        if(!dispName) {
           $(".errors").text('Display Name must not be empty!');
           $("#displayNameCreate").focus();
           return;
@@ -40,13 +40,13 @@ define(['jquery',
     joinNearbyGame: function() {
       var self = this;
       var dispName = $("#displayNameJoinNearby").val();
-      if(dispName === null || dispName === "") {
+      if(!dispName) {
         $(".errors").text('Display Name must not be empty!');
         $("#displayNameJoinNearby").focus();
         return;
       }
       console.log('dispName: ' + dispName + ', gameId: ' + self.nearbyGame);
-      if(self.nearbyGame === null || self.nearbyGame === '') {
+      if(!self.nearbyGame) {
         $(".errors").text('You must have a game selected to join!');
         return;
       }
@@ -56,14 +56,14 @@ define(['jquery',
     // joinById acts like createGame but uses a set ID rather than an auto generated
     joinById: function() {
       var dispName = $("#displayNameJoin").val();
-      if(dispName === null || dispName === "") {
+      if(!dispName) {
         $(".errors").text('Display Name must not be empty!');
         $("#displayNameJoin").focus();
         return;
       }
       // parse game ID
       var gameId = $('#gameID').val();
-      if(gameId === null || gameId === "") {
+      if(!gameId) {
         $(".errors").text('Game ID must not be empty!');
         $("#gameID").focus();
         return;
