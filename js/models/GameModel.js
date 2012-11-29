@@ -38,7 +38,9 @@ define(["jquery",
       },
 
       chooseCzar: function( self, callback ) {
-        var czarPosition = this.getRandomInt( 0, self.game.get( 'players' ).length - 1 );
+        var numOfPlayers = self.game.get( 'players' ).length,
+            round = self.game.get( 'currentRound' ),
+            czarPosition = round % numOfPlayers;
         self.game.get( 'players' ).at( czarPosition ).set({ 'isCzar': true });
         self.socket.emit( 'czar chosen', self.game );
         callback();

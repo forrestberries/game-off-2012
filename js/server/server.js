@@ -1,8 +1,8 @@
 /* this is the file thats on the server running socket.io.
 * putting it here for version control and because ST2
 * is a way better IDE than vim. */
-var io = require('C:\\Users\\IGEN721\\NODE\\node_modules\\socket.io'),
-    express = require('C:\\Users\\IGEN721\\NODE\\node_modules\\express'),
+var io = require('socket.io'),
+    express = require('express'),
     app = express.createServer(),
     games = {},
     gamesInProgress = 0,
