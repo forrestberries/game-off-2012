@@ -121,6 +121,7 @@ define([
       self.game.updateGameObjectFromData( self, data );
       self.game.updateCards( data, self );
 
+      console.log( self.player );
       console.log( 'dont allow me to join? ', self.game.hasAnyonePlayed(), !self.player.get( 'isPlaying' ) );
       if( dontAllowPlayerToJoin ) {
         $( '#waiting-msg' ).find( '.modal-body' ).html( '<p>The game is in progress. You will automagically join for the next round.</p>' );

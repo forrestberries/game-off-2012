@@ -88,6 +88,7 @@ define(["jquery",
         var newPlayers = data.players,
             newPlayersCollection = new PlayersCollection(),
             allCardsInPlay = new WhiteCardsCollection();
+
         for( var i = 0; i < newPlayers.length; i++ ) {
           var whites = new WhiteCardsCollection(),
               blacks = new BlackCardsCollection(),
