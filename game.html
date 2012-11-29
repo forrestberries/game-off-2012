@@ -99,18 +99,8 @@
       </div>
     </script>
     <script id='players-list-view' type='text/template'>
-<<<<<<< HEAD
-      <table class='game-player-table table table-hover'>
-        <thead>
-          <tr>
-            <th>Name</th><th>Socket ID</th><th>Points</th>
-          </tr>
-        </thead>
-        <tbody>
-=======
       <div id='players-list'>
         <ul>
->>>>>>> 165c268bc4e840474df5d055df95fe175e6446ba
           <% _.each(players.toJSON(), function(player, id) { %>
             <li <% if( player.hasPlayed === true ) { print( 'class="hasPlayed"' ); } else if( player.isCzar ) { print( 'class="isCzar"' ); } %> data-id=<%= id %>>
               <span data-prop="name" ><%= player.name %></span>&nbsp;

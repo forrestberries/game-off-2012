@@ -8,7 +8,7 @@ var io = require('socket.io'),
     gamesInProgress = 0,
     fakeGameArray = [];
 
-fillGamesWithTestData();
+//fillGamesWithTestData();
 
 app
 	.configure(function () {
