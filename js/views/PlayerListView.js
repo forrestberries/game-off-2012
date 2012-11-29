@@ -35,9 +35,14 @@ define(['jquery', 'backbone', 'collections/PlayersCollection'], function($, Back
     playerLeft: function( badsocketid, self ) {
       var clazz = this;
       console.log( badsocketid + ' left the game' );
-      self.game.get( 'players' ).remove( self.game.get( 'players' ).get( badsocketid ) );
       this.collection.remove( badsocketid );
-      clazz.socket.emit( 'update server listing', self.game );
+      if( self.game.get( 'players' ).get( badsocketid ).get( 'hasPlayed' ) || self.game.get( 'players' ).get( badsocketid ).get( 'isCzar' ) ) {
+        self.game.get( 'players' ).remove( self.game.get( 'players' ).get( badsocketid ) );
+        clazz.socket.emit( 'reset round', self.game );
+      } else {
+        self.game.get( 'players' ).remove( self.game.get( 'players' ).get( badsocketid ) );
+        clazz.socket.emit( 'update server listing', self.game );
+      }
     },
 
     addPlayer: function( playerModel ) {

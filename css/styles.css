@@ -26,17 +26,48 @@ body {
 .hidden {
   display: none;
 }
-.isCzar td {
-  color: red;
+#players-list {
+  margin-top: -20px;
 }
-.hasPlayed td {
-  background-color: yellow;
+#players-list ul {
+  list-style: none;
+}
+#players-list li {
+  background-color: white;
+  color: black;
+  display: inline-block;
+  padding: 6px;
+  -webkit-border-top-right-radius: 0px;
+  -webkit-border-bottom-right-radius: 8px;
+  -webkit-border-bottom-left-radius: 8px;
+  -webkit-border-top-left-radius: 0px;
+  -moz-border-radius-topright: 0px;
+  -moz-border-radius-bottomright: 8px;
+  -moz-border-radius-bottomleft: 8px;
+  -moz-border-radius-topleft: 0px;
+  border-top-right-radius: 0px;
+  border-bottom-right-radius: 8px;
+  border-bottom-left-radius: 8px;
+  border-top-left-radius: 0px;
+  -moz-background-clip: padding;
+  -webkit-background-clip: padding-box;
+  background-clip: padding-box;
+  border-top: solid 1px #d4d4d4;
+  border-left: solid 1px #d4d4d4;
+  border-right: solid 1px #d4d4d4;
+  border-bottom: solid 1px #d4d4d4;
+}
+#players-list li.isCzar {
+  background-color: black;
+  color: white;
+}
+#players-list li.hasPlayed {
+  background-color: #EEE;
 }
 .settings {
   color: #000;
 }
-.search .modal,
-#waiting-modal .modal {
+.search .modal, #waiting-modal .modal {
   color: #000;
 }
 #nearby-games .selected {
@@ -86,17 +117,14 @@ body {
   background-color: #000;
   color: #FFF;
   width: 150px;
-  height: 200px;
-  margin-right: 10px;
-  margin-bottom: 10px;
-  float: left;
-  padding: 15px;
+  padding: 5px;
   -webkit-border-radius: 5px;
   -moz-border-radius: 5px;
   border-radius: 5px;
   -moz-background-clip: padding;
   -webkit-background-clip: padding-box;
   background-clip: padding-box;
+  display: inline-block;
 }
 @media screen and (max-width: 373px) {
   h1 {

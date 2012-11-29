@@ -66,6 +66,25 @@ sio.sockets.on( 'connection', function( socket ) {
 		sio.sockets.in( game.id ).emit( 'update room', game );
 	});
 
+	socket.on( 'reset round', function( game ) {
+		console.log( 'resetting round for ' + game.id );
+		for( var i = 0; i < game.players.length; i++ ) {
+    	game.players[i].cardsInPlay = [];
+    	game.players[i].whitecards = [];
+    	game.players[i].isWinner = false;
+    	game.players[i].isCzar = false;
+    	game.players[i].hasPlayed = false;
+    	game.players[i].hasDrawnBlackCard = false;
+    	game.players[i].czarSetForCurrentRound = false;
+    }
+    game.czarSetForCurrentRound = false;
+    game.inProgress = false;
+    game.blackCardsInPlay = [];
+    game.allCardsInPlay = [];
+		games[game.id] = game;
+		sio.sockets.in( game.id ).emit( 'new round', game );
+	});
+
 	socket.on( 'new round', function( game ) {
 		console.log( 'new round for ' + game.id );
     for( var i = 0; i < game.players.length; i++ ) {
