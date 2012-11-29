@@ -15,6 +15,10 @@ define(["jquery",
         this.set({ location: new Location() });
         this.set({ deck: new DeckModel() } );
         this.set({ 'blackCardsInPlay': new BlackCardsCollection() });
+        var self = this;
+        this.get( 'location' ).on( 'locationFound', function() {
+          self.trigger( 'locationFound' );
+        });
       },
 
       hasAnyonePlayed: function() {

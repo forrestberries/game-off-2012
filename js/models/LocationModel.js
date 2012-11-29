@@ -4,7 +4,6 @@ define(["jquery", "backbone"], function($, Backbone) {
 
         // Model Constructor
         initialize: function() {
-             this.setLatLong();
              var self = this;
              var locationFound = false;
         },

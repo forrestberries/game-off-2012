@@ -113,15 +113,17 @@ define([
 
     updateRoom: function( data, self ) {
       console.log( 'update room data', data );
+      console.log( self.player.get( 'isPlaying' ) );
       var dontAllowPlayerToJoin = self.game.hasAnyonePlayed() && !self.player.get( 'isPlaying' );
 
       this.playerListView.update( data.players );
 
+      console.log( self.player.get( 'isPlaying' ) );
       self.game.updateGamePlayers( data, self );
+      console.log( self.player.get( 'isPlaying' ) );
       self.game.updateGameObjectFromData( self, data );
       self.game.updateCards( data, self );
 
-      console.log( self.player );
       console.log( 'dont allow me to join? ', self.game.hasAnyonePlayed(), !self.player.get( 'isPlaying' ) );
       if( dontAllowPlayerToJoin ) {
         $( '#waiting-msg' ).find( '.modal-body' ).html( '<p>The game is in progress. You will automagically join for the next round.</p>' );
@@ -241,9 +243,17 @@ define([
         );
       }
       self.player = player;
+      self.player.set( {'isPlaying': false} );
       this.game.set({ inProgress: true });
       window.CAH.socket = self.socket;
-      self.spawnChildViews();
+
+      self.game.on( 'locationFound', function() {
+        self.spawnChildViews();
+        self.joinOrCreateGame();
+
+        self.gameWaitingView = new GameWaitingView().render();
+      });
+
     }
   });
 
