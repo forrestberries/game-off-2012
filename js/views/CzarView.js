@@ -37,7 +37,7 @@ define(['jquery', 'backbone', 'collections/WhiteCardsCollection'], function($, B
         var theyHave = true;
         var players = self.options.game.get( 'players' );
         for( var i = 0; i < players.length; i++ ) {
-          if( !players.models[i].get( 'hasPlayed' ) && !players.models[i].get( 'isCzar' ) ) {
+          if( !players.models[i].get( 'hasPlayed' ) && !players.models[i].get( 'isCzar' ) && players.models[i].get( 'isPlaying' ) ) {
             theyHave = false;
           }
         }

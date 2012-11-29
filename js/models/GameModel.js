@@ -17,6 +17,17 @@ define(["jquery",
         this.set({ 'blackCardsInPlay': new BlackCardsCollection() });
       },
 
+      hasAnyonePlayed: function() {
+        console.log( 'this.players', this.get( 'players' ) );
+        for( var i = 0; i < this.get( 'players' ).length; i++ ) {
+          console.log( 'hasPlayed', this.get( 'players' ).models[i].get( 'hasPlayed' ) );
+          if( this.get( 'players' ).models[i].get( 'hasPlayed' ) ) {
+            return true;
+          }
+        }
+        return false;
+      },
+
       beginRound: function( self ) {
         if( self.game.get( 'czarSetForCurrentRound' ) ) {
 
@@ -171,16 +182,6 @@ define(["jquery",
         name: "",
 
         location: {}
-
-        //blackCardsInPlay: []
-
-        // deck
-
-        // location
-
-        // gameOptions
-
-        // czar (Player)
 
       }
 

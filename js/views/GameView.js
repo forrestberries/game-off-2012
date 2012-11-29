@@ -60,22 +60,28 @@ define([
     },
 
     gameInProgress: function( self ) {
-      var alreadyHidden = ( $( '#waiting-msg' ).css( 'display' ) == 'none' );
+      var alreadyHidden = ( $( '#waiting-msg' ).css( 'display' ) == 'none' ),
+          playerIsHost = !!self.player.get( 'gameHost' ),
+          playerIsCzar = self.player.get( 'isCzar' ),
+          czarIsNotSet = !self.player.get( 'czarSetForCurrentRound' ),
+          czarIsSet = !czarIsNotSet,
+          gameIsInProgress = self.game.get( 'inProgress' ),
+          needToDrawCards = (self.player.get( 'whitecards' ).length < 1 );
 
       if( !alreadyHidden ) {
         self.gameWaitingView.hideModal();
       }
 
-      if( !!self.player.get( 'gameHost' ) ) {
-        if( !self.player.get( 'czarSetForCurrentRound' ) )  {
+      if( playerIsHost ) {
+        if( czarIsNotSet )  {
           self.player.set({'czarSetForCurrentRound': true});
             self.game.chooseCzar( self, function() {
           });
         }
       }
-      if( self.game.get( 'inProgress' ) ) {
-        if( self.game.get( 'czarSetForCurrentRound' ) ) {
-          if( self.player.get( 'isCzar' ) ) {
+      if( gameIsInProgress ) {
+        if( czarIsSet ) {
+          if( playerIsCzar ) {
             if( !self.czarView ) {
               self.czarView = new CzarView({ collection: self.game.get( 'allCardsInPlay' ), game:self.game, player: self.player }).render();
             } else {
@@ -83,7 +89,7 @@ define([
             }
           } else { //player is NOT the czar
             //draw some white cards once
-            if( self.player.get( 'whitecards' ).length < 1 ) {
+            if( needToDrawCards ) {
               self.game.drawWhiteCards( self );
             }
           }
@@ -95,7 +101,6 @@ define([
           if( self.czarView ) {
             self.czarView.trigger( 'clear' );
           }
-          console.log( 'resetting playerCardView' );
           self.playerCardView.trigger( 'clear' );
           self.blackCardInPlayView.trigger( 'clear' );
           //set up and display end round view
@@ -111,17 +116,21 @@ define([
     },
 
     updateRoom: function( data, self ) {
-      console.log( '%cUpdate Room', 'color: blue;' );
-      console.log( data );
+      var dontAllowPlayerToJoin = self.game.hasAnyonePlayed() && !self.player.get( 'isPlaying' );
+
       this.playerListView.update( data.players );
 
       self.game.updateGamePlayers( data, self );
       self.game.updateGameObjectFromData( self, data );
       self.game.updateCards( data, self );
 
-
-      if( self.game.gameCanBegin() ) {
-        self.gameInProgress( self );
+      if( dontAllowPlayerToJoin ) {
+        $( '#waiting-msg' ).find( '.modal-body' ).html( '<p>The game is in progress. You will automagically join for the next round.</p>' );
+      } else {
+        if( self.game.gameCanBegin() ) {
+          self.player.set({ 'isPlaying': true });
+          self.gameInProgress( self );
+        }
       }
 
       window.CAH.game = self.game;
@@ -155,6 +164,7 @@ define([
           'isCzar': false,
           'isWinner': false,
           'hasPlayed': false,
+          'isPlaying': true,
           'hasDrawnBlackCard': false,
           'whitecards': new WhiteCardsCollection(),
           'czarSetForCurrentRound': false
@@ -199,10 +209,8 @@ define([
           self = this;
 
       if( playerSettingsJson ) {
-        //lulz just for debuggins
-        name = playerSettingsJson.displayName + ( new Date().getMilliseconds() );
+        name = playerSettingsJson.displayName;
       } else {
-        //lulz just for debuggins
         //TODO
         name = 'bob' + ( new Date().getMilliseconds() );
       }
