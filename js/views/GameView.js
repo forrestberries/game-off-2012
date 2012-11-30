@@ -35,10 +35,6 @@ define([
       self.socket = socket;
 
       self.syncFromLocalStorage( id );
-
-      self.joinOrCreateGame();
-
-      self.gameWaitingView = new GameWaitingView().render();
     },
 
     events: {
@@ -246,13 +242,13 @@ define([
       self.player.set( {'isPlaying': false} );
       this.game.set({ inProgress: true });
       window.CAH.socket = self.socket;
-
-      self.game.on( 'locationFound', function() {
-        self.spawnChildViews();
+      self.game.get( 'location' ).on( 'locationFound', function() {
         self.joinOrCreateGame();
 
         self.gameWaitingView = new GameWaitingView().render();
+        self.spawnChildViews();
       });
+      self.game.get( 'location' ).setLatLong();
 
     }
   });
