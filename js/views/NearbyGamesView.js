@@ -11,6 +11,7 @@ define(['jquery',
     initialize: function() {
       var self = this;
       var userLoc = new Location();
+      userLoc.setLatLong();
       var selectedGame = {};
       this.collection = new GamesCollection();
       this.collection.on('set change add remove reset', function() {
