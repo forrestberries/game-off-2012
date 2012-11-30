@@ -74,7 +74,7 @@ body {
   color: white;
 }
 #players-list li.hasPlayed {
-  background-color: #EEE;
+  background-color: #CCC;
 }
 .settings,
 .modal {

@@ -22,6 +22,15 @@ define(['jquery', 'backbone', 'collections/WhiteCardsCollection'], function($, B
 
     render: function() {
       console.log( '%cCzarView.render()', 'color: blue;' );
+      // mask cards until all players (except czar) have played
+      console.log('players length:' + this.options.game.get( 'players' ).length);
+      console.log('collection length:' + this.collection.length);
+      if (this.options.game.get( 'players' ).length -1 !== this.collection.length) {
+        for (var i = 0; i < this.collection.length; i++) {
+          console.log(this.collection.at(i));
+          this.collection.at(i).set( { text: 'Cards Against Humanity' });
+        }
+      }
       this.template = _.template( $("#czar-view").html(),  { cards: this.collection } );
       this.$el.html(this.template);
       return this;
