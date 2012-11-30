@@ -70,7 +70,6 @@ sio.sockets.on( 'connection', function( socket ) {
 		console.log( 'resetting round for ' + game.id );
 		for( var i = 0; i < game.players.length; i++ ) {
     	game.players[i].cardsInPlay = [];
-    	game.players[i].whitecards = [];
     	game.players[i].isWinner = false;
     	game.players[i].isCzar = false;
     	game.players[i].hasPlayed = false;
@@ -87,15 +86,14 @@ sio.sockets.on( 'connection', function( socket ) {
 
 	socket.on( 'new round', function( game ) {
 		console.log( 'new round for ' + game.id );
-    for( var i = 0; i < game.players.length; i++ ) {
-    	game.players[i].cardsInPlay = [];
-    	game.players[i].whitecards = [];
-    	game.players[i].isWinner = false;
-    	game.players[i].isCzar = false;
-    	game.players[i].hasPlayed = false;
-    	game.players[i].hasDrawnBlackCard = false;
-    	game.players[i].czarSetForCurrentRound = false;
-    }
+	    for( var i = 0; i < game.players.length; i++ ) {
+	    	game.players[i].cardsInPlay = [];
+	    	game.players[i].isWinner = false;
+	    	game.players[i].isCzar = false;
+	    	game.players[i].hasPlayed = false;
+	    	game.players[i].hasDrawnBlackCard = false;
+	    	game.players[i].czarSetForCurrentRound = false;
+	    }
 		games[game.id] = game;
 		sio.sockets.in( game.id ).emit( 'new round', game );
 	});

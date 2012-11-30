@@ -96,8 +96,12 @@ define([
 
         //this for loop preserves players and their state
         //must go before the clear event is triggered
+        console.log( 'self.player.get( whitecards ).length before', self.options.player.get( 'whitecards' ).length );
         for( var z = 0; z < self.options.game.get( 'players' ).length; z++ ) {
           var player = self.options.game.get( 'players' ).models[z];
+          player.set({
+            'whitecards': self.options.game.get( 'players' ).models[z].get( 'whitecards' )
+          });
           resetGamePlayers.add( player );
         }
 
@@ -115,6 +119,7 @@ define([
             'currentRound': self.options.game.get( 'currentRound' ) + 1
           });
 
+          console.log( 'self.player.get( whitecards ).length after', self.options.player.get( 'whitecards' ).length );
           //the server resets some attributes on the players ( can't do it in this view )
           window.CAH.socket.emit( 'new round', self.options.game );
         }

@@ -90,12 +90,11 @@ define(["jquery",
             allCardsInPlay = new WhiteCardsCollection();
 
         for( var i = 0; i < newPlayers.length; i++ ) {
-          var whites = new WhiteCardsCollection(),
+          var whites = new WhiteCardsCollection( newPlayers[i].whitecards ),
               blacks = new BlackCardsCollection(),
               inplay = new WhiteCardsCollection(),
               p = new PlayerModel( newPlayers[i] );
 
-          whites.add( newPlayers[i].whitecards );
           blacks.add( newPlayers[i].blackcards );
           inplay.add( newPlayers[i].cardsInPlay );
           allCardsInPlay.add( newPlayers[i].cardsInPlay );
@@ -137,8 +136,9 @@ define(["jquery",
       },
 
       drawWhiteCards: function( self ) {
-        var numberOfCards = 10; //TODO get from Settings
-        for( var i = 0; i < numberOfCards; i++ ) {
+        var numberOfCards = 10, //TODO get from Settings
+              numPlayerHas = self.player.get( 'whitecards' ).length;
+        for( var i = 0; i < numberOfCards - numPlayerHas; i++ ) {
           var whitecards = this.get( 'deck' ).get( 'whitecards' ),
               cardPosition = this.getRandomInt( 0, whitecards.length ),
               card = whitecards.at( cardPosition );

@@ -16,7 +16,6 @@ define(['jquery', 'backbone', 'collections/WhiteCardsCollection'], function($, B
     },
 
     resetView: function() {
-      this.collection.reset();
       this.$el.empty();
     },
 
@@ -62,8 +61,11 @@ define(['jquery', 'backbone', 'collections/WhiteCardsCollection'], function($, B
     },
 
     render: function() {
-      this.template = _.template( $("#players-card-view").html(),  {  cards: this.collection } );
-      this.$el.html(this.template);
+
+      if( !this.options.player.get( 'isCzar' ) && this.options.game.get( 'czarSetForCurrentRound' ) ) {
+        this.template = _.template( $("#players-card-view").html(),  {  cards: this.collection } );
+        this.$el.html(this.template);
+      }
       return this;
     },
 

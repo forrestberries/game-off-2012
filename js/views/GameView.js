@@ -55,6 +55,7 @@ define([
     },
 
     gameInProgress: function( self ) {
+
       var alreadyHidden = ( $( '#waiting-msg' ).css( 'display' ) == 'none' ),
           playerIsHost = !!self.player.get( 'gameHost' ),
           gameIsInProgress = self.game.get( 'inProgress' );
@@ -80,8 +81,10 @@ define([
             }
           } else { //player is NOT the czar
             //draw some white cards once
-            if( self.player.get( 'whitecards' ).length < 1 ) {
+            if( self.player.get( 'whitecards' ).length < 10 ) {
               self.game.drawWhiteCards( self );
+            } else {
+              self.playerCardView.render();
             }
           }
         }
@@ -111,7 +114,6 @@ define([
       var dontAllowPlayerToJoin = self.game.hasAnyonePlayed() && !self.player.get( 'isPlaying' );
 
       this.playerListView.update( data.players );
-
       self.game.updateGamePlayers( data, self );
       self.game.updateGameObjectFromData( self, data );
       self.game.updateCards( data, self );
@@ -159,7 +161,6 @@ define([
           'hasPlayed': false,
           'isPlaying': true,
           'hasDrawnBlackCard': false,
-          'whitecards': new WhiteCardsCollection(),
           'czarSetForCurrentRound': false
         });
         self.spawnChildViews();
