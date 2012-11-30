@@ -6,14 +6,14 @@ define([
 
   var Player = Backbone.Model.extend({
     idAttribute: "socketid",
-    
+
     // Model Constructor
     initialize: function() {
       this.set({ 'blackcards': new BlackCardsCollection() });
       this.set({ 'whitecards': new WhiteCardsCollection() });
       this.set({ 'cardsInPlay': new WhiteCardsCollection() });
-      
-      
+
+
     },
 
     addWhiteCard: function( card ) {
@@ -22,10 +22,6 @@ define([
 
     removeWhiteCard: function( card ) {
       this.get( 'whitecards' ).remove( card );
-    },
-
-    playWhiteCard: function( card ) {
-
     },
 
     // Default values for all of the Player Model attributes
@@ -54,7 +50,7 @@ define([
       blackcards: [],
 
       cardsInPlay: []
-      
+
       // playerSettings
 
     }

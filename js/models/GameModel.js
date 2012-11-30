@@ -99,8 +99,12 @@ define(["jquery",
           blacks.add( newPlayers[i].blackcards );
           inplay.add( newPlayers[i].cardsInPlay );
           allCardsInPlay.add( newPlayers[i].cardsInPlay );
-
-          p.set({ 'whitecards': whites, 'blackcards': blacks, 'cardsInPlay': inplay });
+          p.set({
+            'whitecards': whites,
+            'blackcards': blacks,
+            'cardsInPlay': inplay,
+            'isPlaying': newPlayers[i].isPlaying
+          });
           if( p.id == self.player.id && ( p.get( 'isCzar' ) ) ) {
             self.player.set({ 'isCzar': true });
           }

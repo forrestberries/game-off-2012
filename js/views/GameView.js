@@ -108,23 +108,20 @@ define([
 
     updateRoom: function( data, self ) {
       console.log( 'update room data', data );
-      console.log( self.player.get( 'isPlaying' ) );
       var dontAllowPlayerToJoin = self.game.hasAnyonePlayed() && !self.player.get( 'isPlaying' );
 
       this.playerListView.update( data.players );
 
-      console.log( self.player.get( 'isPlaying' ) );
       self.game.updateGamePlayers( data, self );
-      console.log( self.player.get( 'isPlaying' ) );
       self.game.updateGameObjectFromData( self, data );
       self.game.updateCards( data, self );
 
-      console.log( 'dont allow me to join? ', self.game.hasAnyonePlayed(), !self.player.get( 'isPlaying' ) );
       if( dontAllowPlayerToJoin ) {
         $( '#waiting-msg' ).find( '.modal-body' ).html( '<p>The game is in progress. You will automagically join for the next round.</p>' );
       } else {
         if( self.game.gameCanBegin() ) {
           self.player.set({ 'isPlaying': true });
+          self.game.get( 'players' ).get( self.player.id ).set({ 'isPlaying': true });
           self.gameInProgress( self );
         }
       }
@@ -199,14 +196,14 @@ define([
     },
 
     syncFromLocalStorage: function() {
-      var gameFromLocalStorageJson = JSON.parse( localStorage.getItem( 'game' ) );
+      var gameFromLocalStorageJson = JSON.parse( localStorage.getItem( 'game' ) ),
           playerSettingsJson = JSON.parse( localStorage.getItem( 'playerSettings' ) ),
           name = '', //can get player name from PlayerSettings
           self = this;
 
 
       self.on( 'bullhonky' , function() {
-        var player = new PlayerModel( { name: name } );
+        var player = new PlayerModel( { name: name, isPlaying: false } );
         if( gameFromLocalStorageJson ) {
           //found a good game object in local storage
           localStorage.removeItem( 'game' );
@@ -234,8 +231,7 @@ define([
           );
         }
         self.player = player;
-        self.player.set( {'isPlaying': false} );
-        this.game.set({ inProgress: true });
+        self.game.set({ inProgress: true });
         window.CAH.socket = self.socket;
         self.game.get( 'location' ).on( 'locationFound', function() {
           self.joinOrCreateGame();
