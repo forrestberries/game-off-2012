@@ -44,8 +44,8 @@
     <section id="players"></section>
     <section id="main" class="container">
     </section>
-    <section id="endRound"></section>
     <section id="blackCardInPlay"></section>
+    <section id="endRound"></section>
     <section id="cards"></section>
     <section id="cardsInPlay"></section>
     <section id="czarCardsInPlay"></section>
@@ -76,14 +76,38 @@
       </div>
     </script>
     <script id='end-round' type="text/template">
-      <h1>Round Over</h1>
-      <p><%= player.name %> won that round with <%= winningResponse %></p>
-      <% _.each(allResponses, function(response) { %>
-        <div class="player-whitecard"><%= response %></div>
-      <% }); %>
-      <div id='new-round-timer'></div>
+
+      <div class='.clearfix'>
+        <h1>Round Over</h1>
+            <p class='lead'><%= player.name %> won that round with: </p>
+            <div class='clearfix'>
+              <div class='player-whitecard'><%= winningResponse %></div>
+            </div>
+            <div class='clearfix'>
+              <h3>Other Lesser Responses</h3>
+                        <% _.each(allResponses, function(response) { %>
+                          <div class="player-whitecard"><%= response %></div>
+                        <% }); %>
+              </div>
+            <div id='new-round-timer' class='lead'></div>
+        </div>
     </script>
     <script id="players-card-view" type="text/template">
+       <div data-backdrop="static" class="modal hide fade" id="confirm-card-modal" tabindex="-1" role="dialog" aria-labelledby="confirm-card-modalLabel" aria-hidden="true">
+        <div class="modal-header">
+            <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+            <h3 id="confirm-card-modalLabel">Play Card</h3>
+        </div>
+        <div class="modal-body">
+          <p>You are about to play a card</p>
+          <p class='blackcard-text'></p>
+          <p class='whitecard-text'></p>
+        </div>
+        <div class="modal-footer">
+            <button class="btn" id="closed" data-dismiss="modal" aria-hidden="true">Pick Different Card</button>
+            <button class="btn btn-primary" id="play-card-ok">Ok</button>
+        </div>
+    </div>
       <div>
         <% _.each(cards.toJSON(), function(card) { %>
           <div class="player-whitecard" data-id=<%= card.socketid %>><%= card.text %></div>

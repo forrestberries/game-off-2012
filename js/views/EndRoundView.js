@@ -58,14 +58,16 @@ define([
       for( var i = 0; i < blackcard.get( 'responses' ).length; i++ ) {
         var resp = blackcard.get( 'responses' )[i],
             newResp;
+        //sad hack :(
+        if( resp !== self.winner.get( 'cardsInPlay' ).models[0].get( 'text' ) ) {
+          if( text.indexOf( '_' ) > -1 ) {
+            newResp = text.replace( /_+/, "_" + resp + "_" );
+          } else {
+            newResp = text + ' ' + resp;
+          }
 
-        if( text.indexOf( '_' ) > -1 ) {
-          newResp = text.replace( /_+/, "_" + resp + "_" );
-        } else {
-          newResp = text + ' ' + resp;
+          completeResponses.push( newResp );
         }
-
-        completeResponses.push( newResp );
       }
 
       if( text.indexOf( '_' ) < 0 ) {

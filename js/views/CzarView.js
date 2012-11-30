@@ -11,9 +11,6 @@ define(['jquery', 'backbone', 'collections/WhiteCardsCollection'], function($, B
     initialize: function() {
       var self = this;
       this.on( 'clear', this.resetView );
-      this.collection.on( 'add remove change reset', function( data ) {
-        self.render();
-      });
     },
 
     events: {
@@ -25,7 +22,7 @@ define(['jquery', 'backbone', 'collections/WhiteCardsCollection'], function($, B
       // mask cards until all players (except czar) have played
       if (this.options.game.get( 'players' ).length -1 !== this.collection.length) {
         for (var i = 0; i < this.collection.length; i++) {
-          this.collection.at(i).set( { text: 'Cards Against Humanity' });
+          this.collection.at(i).set( { text: 'Cards Against Humanity' }, { "silent": true });
         }
       }
       this.template = _.template( $("#czar-view").html(),  { cards: this.collection } );
@@ -34,7 +31,8 @@ define(['jquery', 'backbone', 'collections/WhiteCardsCollection'], function($, B
     },
 
     updateCards: function( cards ) {
-      this.collection.reset( cards.models );
+      this.collection.reset( cards.models, { "silent":true } );
+      this.render();
     },
 
     chooseWinnerCard: function( event ) {
@@ -49,7 +47,6 @@ define(['jquery', 'backbone', 'collections/WhiteCardsCollection'], function($, B
         }
         return theyHave;
       };
-      console.log( allPlayersHavePlayed(), self.options.game.get( 'inProgress' ) );
       if( allPlayersHavePlayed() && self.options.game.get( 'inProgress' ) ) {
         var card = $( event.target ),
             cardText = card.text(),
