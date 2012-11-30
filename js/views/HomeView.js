@@ -139,6 +139,15 @@ define(['jquery',
           console.log('selected game ' + gameId);
           self.nearbyGame = gameId;
         });
+
+        $('#info').on('show', function(e) {
+          var modal = $(this);
+
+          modal.css('margin-top', (modal.outerHeight() / 2) * -1)
+               .css('margin-left', (modal.outerWidth() / 2) * -1);
+
+          return this;
+        });
       });
       return this;
     },

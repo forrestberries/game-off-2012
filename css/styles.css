@@ -141,3 +141,11 @@ body {
     font-size: 14px;
   }
 }
+@media (max-width: 767px) {
+  .modal {
+    top: 20px;
+    margin: 0 0 0 -280px;
+    left: 50%;
+    position: fixed;
+  }
+}
