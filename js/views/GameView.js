@@ -17,7 +17,8 @@ define([
   'views/EndRoundView',
   'collections/WhiteCardsCollection',
   'collections/BlackCardsCollection',
-  'models/DeckModel'], function($, Backbone, Socket, PlayersCollection, PlayerModel, LocationModel, GameModel, BlackCardModel, PlayerListView, PlayerCardView, GameWaitingView, CardsInPlayView, BlackCardInPlayView, CzarView, EndRoundView, WhiteCardsCollection, BlackCardsCollection, DeckModel){
+  'models/DeckModel',
+  'text!templates/info.html'], function($, Backbone, Socket, PlayersCollection, PlayerModel, LocationModel, GameModel, BlackCardModel, PlayerListView, PlayerCardView, GameWaitingView, CardsInPlayView, BlackCardInPlayView, CzarView, EndRoundView, WhiteCardsCollection, BlackCardsCollection, DeckModel, infoHTML){
   var View = Backbone.View.extend({
 
     el: "section#main",
@@ -28,9 +29,6 @@ define([
           socket = io.connect( 'http://' + window.CAH.serverhost );
 
       this.id = id;
-      if( !window.CAH ) {
-        window.CAH = {};
-      }
 
       self.socket = socket;
 
@@ -56,6 +54,7 @@ define([
 
     render: function() {
       this.playerListView.render();
+      this.$el.html(infoHTML);
       return this;
     },
 

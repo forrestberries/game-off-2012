@@ -6,7 +6,8 @@ define(['jquery',
   'collections/PlayersCollection',
   'collections/GamesCollection',
   'views/NearbyGamesView',
-  'text!templates/home.html'], function($, Backbone, Game, PlayerSettings, Player, PlayersCollection, GamesCollection, NearbyGamesView, homeHTML){
+  'text!templates/home.html',
+  'text!templates/info.html'], function($, Backbone, Game, PlayerSettings, Player, PlayersCollection, GamesCollection, NearbyGamesView, homeHTML, infoHTML){
   var View = Backbone.View.extend({
 
     el: "section#main",
@@ -96,7 +97,7 @@ define(['jquery',
     },
 
     render: function() {
-      this.$el.html(homeHTML);
+      this.$el.html(homeHTML + infoHTML);
       var self = this;
 
       // load in player name into the fields for the user

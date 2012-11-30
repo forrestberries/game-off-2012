@@ -26,6 +26,18 @@ body {
 .hidden {
   display: none;
 }
+.headerTitle {
+  float: left;
+  width: 80%;
+}
+.headerInfoBtn {
+  float: left;
+  width: 20%;
+  line-height: 50px;
+}
+.navbar {
+  height: 55px;
+}
 #players-list {
   margin-top: -20px;
 }
@@ -64,10 +76,7 @@ body {
 #players-list li.hasPlayed {
   background-color: #EEE;
 }
-.settings {
-  color: #000;
-}
-.search .modal, #waiting-modal .modal {
+.modal {
   color: #000;
 }
 #nearby-games .selected {
@@ -79,9 +88,6 @@ body {
 }
 .home-view button {
   width: 45%;
-}
-.home-view .modal {
-  color: #000;
 }
 .container {
   max-width: 500px;
@@ -106,6 +112,7 @@ body {
   margin-bottom: 10px;
   float: left;
   padding: 15px;
+  cursor: pointer;
   -webkit-border-radius: 5px;
   -moz-border-radius: 5px;
   border-radius: 5px;

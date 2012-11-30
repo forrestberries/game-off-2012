@@ -13,6 +13,20 @@ body {
   display: none;
 }
 
+.headerTitle {
+  float:left;
+  width:80%;
+}
+.headerInfoBtn {
+  float:left;
+  width:20%;
+  line-height: 50px;
+}
+
+.navbar {
+  height: 55px;
+}
+
 #players-list {
   margin-top: -20px;
   ul {
@@ -35,14 +49,8 @@ body {
     }
   }
 }
-
-.settings {
-  color:#000;
-}
-.search, #waiting-modal {
-  .modal {
+.modal {
     color:#000;
-  }
 }
 #nearby-games .selected{
   background-color: #006dcc;
@@ -54,9 +62,6 @@ body {
     width: 45%;
   }
   .row {
-  }
-  .modal {
-    color:#000;
   }
 }
 .container {
@@ -78,6 +83,7 @@ body {
   margin-bottom:10px;
   float:left;
   padding: 15px;
+  cursor:pointer;
   .rounded( 5px );
 }
 .blackcard {
