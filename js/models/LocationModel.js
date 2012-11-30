@@ -18,6 +18,7 @@ define(["jquery", "backbone"], function($, Backbone) {
         },
 
         setLatLong: function() {
+            console.log( 'getting location' );
             var self = this;
             navigator.geolocation.getCurrentPosition(
                 function(position) {

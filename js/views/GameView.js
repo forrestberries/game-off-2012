@@ -204,51 +204,65 @@ define([
           name = '', //can get player name from PlayerSettings
           self = this;
 
+
+      self.on( 'bullhonky' , function() {
+        var player = new PlayerModel( { name: name } );
+        if( gameFromLocalStorageJson ) {
+          //found a good game object in local storage
+          localStorage.removeItem( 'game' );
+          var location = gameFromLocalStorageJson.location,
+              players = gameFromLocalStorageJson.players;
+
+          this.game = new GameModel( gameFromLocalStorageJson );
+          this.game.set(
+            {
+              location: new LocationModel( location ),
+              players: new PlayersCollection( player )
+            }
+          );
+          this.game.get( 'deck' ).loadCards();
+        } else {
+          //mock one up and join an already existing game
+          //to have game obj filled out later via server syncFromLocalStorages
+          //only ting that needs set is the id and player
+          this.player = player;
+          this.game = new GameModel( { id: this.id } );
+          this.game.set(
+            {
+              players: new PlayersCollection( player )
+            }
+          );
+        }
+        self.player = player;
+        self.player.set( {'isPlaying': false} );
+        this.game.set({ inProgress: true });
+        window.CAH.socket = self.socket;
+        self.game.get( 'location' ).on( 'locationFound', function() {
+          self.joinOrCreateGame();
+
+          self.gameWaitingView = new GameWaitingView().render();
+          self.spawnChildViews();
+        });
+        self.game.get( 'location' ).setLatLong();
+
+      });
+
       if( playerSettingsJson ) {
         name = playerSettingsJson.displayName;
+        self.trigger( 'bullhonky' );
       } else {
-        //TODO
-        name = 'bob' + ( new Date().getMilliseconds() );
-      }
-      var player = new PlayerModel( { name: name } );
-      if( gameFromLocalStorageJson ) {
-        //found a good game object in local storage
-        localStorage.removeItem( 'game' );
-        var location = gameFromLocalStorageJson.location,
-            players = gameFromLocalStorageJson.players;
-
-        this.game = new GameModel( gameFromLocalStorageJson );
-        this.game.set(
-          {
-            location: new LocationModel( location ),
-            players: new PlayersCollection( player )
+        $( '#need-name-modal' ).modal( 'show' );
+        $( '#continue' ).on( 'click', function() {
+          if( $( '#displayName' ).val() ) {
+            $( '#need-name-modal' ).modal( 'hide' );
+            name = $( '#displayName' ).val();
+            var playerSettings = {};
+            playerSettings.displayName = name;
+            localStorage.setItem( 'playerSettings', JSON.stringify( playerSettings ) );
+            self.trigger( 'bullhonky' );
           }
-        );
-        this.game.get( 'deck' ).loadCards();
-      } else {
-        //mock one up and join an already existing game
-        //to have game obj filled out later via server syncFromLocalStorages
-        //only ting that needs set is the id and player
-        this.player = player;
-        this.game = new GameModel( { id: this.id } );
-        this.game.set(
-          {
-            players: new PlayersCollection( player )
-          }
-        );
+        });
       }
-      self.player = player;
-      self.player.set( {'isPlaying': false} );
-      this.game.set({ inProgress: true });
-      window.CAH.socket = self.socket;
-      self.game.get( 'location' ).on( 'locationFound', function() {
-        self.joinOrCreateGame();
-
-        self.gameWaitingView = new GameWaitingView().render();
-        self.spawnChildViews();
-      });
-      self.game.get( 'location' ).setLatLong();
-
     }
   });
 

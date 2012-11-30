@@ -49,9 +49,23 @@
     <section id="cards"></section>
     <section id="cardsInPlay"></section>
     <section id="czarCardsInPlay"></section>
+    <div class="modal hide fade" id="need-name-modal" tabindex="-1" role="dialog" aria-labelledby="joinByIDLabel" aria-hidden="true">
+      <div class="modal-header">
+          <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+          <h3 id="joinByIDLabel">Give yourself a name</h3>
+      </div>
+      <div class="modal-body">
+        <label for="displayName">Display Name</label>
+        <input type="text" id="displayName" name="displayName">
+        <br />
+      </div>
+      <div class="modal-footer">
+          <button class="btn btn-primary" id="continue">Continue</button>
+      </div>
+  </div>
     <!-- Underscore Templates -->
     <script id='waiting' type='text/template'>
-      <div id='waiting-msg' class="modal hide fade">
+      <div data-backdrop="static" id='waiting-msg' class="modal hide fade">
         <div class="modal-header">
           <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
           <h3>Waiting...</h3>

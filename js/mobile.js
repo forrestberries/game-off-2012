@@ -41,7 +41,7 @@ require(['modernizr','jquery','backbone','routers/homeRouter', 'routers/gameRout
   if (! window.CAH ) {
     window.CAH = {};
   }
-  window.CAH.serverhost = 'localhost:20080';//'meowstep.com:20080';
+  window.CAH.serverhost = 'meowstep.com:20080';
   // Instantiates a new Router
   if( document.URL.indexOf( 'game.html' ) > -1 ) {
     console.log( 'starting GameRouter' );

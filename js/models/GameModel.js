@@ -139,6 +139,9 @@ define(["jquery",
               cardPosition = this.getRandomInt( 0, whitecards.length ),
               card = whitecards.at( cardPosition );
 
+          while( !card ) { //for some reason this jacks up and doesn't move right sometimes...
+            card = whitecards.at( this.getRandomInt( 0, whitecards.length ) );
+          }
 
           whitecards.remove( card );
           card.set({ 'socketid': self.player.id });
