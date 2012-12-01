@@ -29,6 +29,9 @@ section {
 .hidden {
   display: none;
 }
+.message {
+  color: #b87777;
+}
 .headerTitle {
   float: left;
   width: 80%;
