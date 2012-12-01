@@ -79,7 +79,8 @@ section {
 #players-list li.hasPlayed {
   background-color: #CCC;
 }
-.settings, .modal {
+.settings,
+.modal {
   color: #000;
 }
 #nearby-games .selected {
@@ -111,6 +112,7 @@ section {
   color: #000;
   width: 150px;
   height: auto;
+  min-height: 200px;
   margin-right: 10px;
   margin-bottom: 10px;
   float: left;
@@ -127,6 +129,7 @@ section {
   background-color: #000;
   color: #FFF;
   width: 150px;
+  min-height: 200px;
   padding: 5px;
   -webkit-border-radius: 5px;
   -moz-border-radius: 5px;
