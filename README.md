@@ -4,6 +4,8 @@ An (almost) exact copy of Cards Against Humanity.  The full instructions can be 
 
 The game requires a minimum of 3 players to play (2 to play, 1 czar) and has a maximum of.. well we never had more than about 10 people in a room.
 
+A copy of the game is hosted [here on GitHub](http://forrestberries.github.com/game-off-2012/index.html).
+
 Due to time constraints, it is missing a couple features from the original game.  There is no concept of gamblinb or a pick 2/3 black card.  And unfortunately there is no way to add rule modifiers as the original game instruction mentions.
 
 There are over 500 white cards in the deck and more than 90 black cards.
