@@ -84,6 +84,9 @@ define([
             if( self.player.get( 'whitecards' ).length < 10 ) {
               self.game.drawWhiteCards( self );
             } else {
+              if( !self.player.get( 'hasPlayed' ) ) {
+                $( '.message' ).text( 'Pick the funniest card you got.' );
+              }
               self.playerCardView.render();
             }
           }

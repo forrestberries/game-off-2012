@@ -21,10 +21,14 @@ define(['jquery', 'backbone', 'collections/WhiteCardsCollection'], function($, B
       console.log( '%cCzarView.render()', 'color: blue;' );
       // mask cards until all players (except czar) have played
       if (this.options.game.get( 'players' ).length -1 !== this.collection.length) {
+        $( '.message' ).text( 'You are the card czar.  Waiting for all players to play...' );
         for (var i = 0; i < this.collection.length; i++) {
           this.collection.at(i).set( { text: 'Cards Against Humanity' }, { "silent": true });
         }
+      } else {
+        $( '.message' ).text( "Everyone's choices are in.. pick the funniest card" );
       }
+
       this.template = _.template( $("#czar-view").html(),  { cards: this.collection } );
       this.$el.html(this.template);
       return this;
@@ -68,6 +72,7 @@ define(['jquery', 'backbone', 'collections/WhiteCardsCollection'], function($, B
           'isWinner': true
         });
         window.CAH.socket.emit( 'update room', this.options.game );
+        $( '.message' ).text( '' );
       }
     }
 

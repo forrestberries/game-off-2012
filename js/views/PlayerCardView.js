@@ -63,7 +63,7 @@ define(['jquery', 'backbone', 'collections/WhiteCardsCollection'], function($, B
               });
 
             window.CAH.socket.emit( 'update room', this.options.game );
-            
+            $( '.message' ).text( "You've played your card.  Waiting on the other players" );
           }
         });
         this.$el.find( '#play-card-ok' )

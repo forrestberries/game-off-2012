@@ -29,6 +29,9 @@ section {
 .hidden {
   display: none;
 }
+.message {
+  color: #b87777;
+}
 .headerTitle {
   float: left;
   width: 80%;
@@ -79,7 +82,8 @@ section {
 #players-list li.hasPlayed {
   background-color: #CCC;
 }
-.settings, .modal {
+.settings,
+.modal {
   color: #000;
 }
 #nearby-games .selected {
